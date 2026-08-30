@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChennaiTrafficPredictionPayload",
+  "type": "object",
+  "required": [
+    "location_id",
+    "prediction_timestamp",
+    "prediction_horizon",
+    "predicted_congestion_level",
+    "predicted_congestion_index",
+    "confidence"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "description": "Standardized Road ID matching the geospatial network",
+      "examples": ["ROAD_ANNA_SALAI_1", "ROAD_GST_1"]
+    },
+    "prediction_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 prediction timestamp"
+    },
+    "prediction_horizon": {
+      "type": "string",
+      "enum": ["15min", "30min", "45min", "60min"]
+    },
+    "predicted_congestion_level": {
+      "type": "string",
+      "enum": ["Low", "Moderate", "High", "Severe"]
+    },
+    "predicted_congestion_index": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "predicted_vehicle_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "predicted_speed": {
+      "type": "number",
+      "minimum": 0.0
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "top_contributing_features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["feature_name", "importance_score", "direction"],
+        "properties": {
+          "feature_name": { "type": "string" },
+          "importance_score": { "type": "number" },
+          "direction": { "type": "string", "enum": ["increases_congestion", "decreases_congestion"] }
+        }
+      }
+    }
+  }
+}

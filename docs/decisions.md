@@ -1,44 +1,76 @@
 # Architectural Decisions Log: Chennai Traffic Intelligence Platform
 
 **Date:** 2026-08-30  
-**Status:** Active Record (Phase 0)
+**Status:** Active Record (Full Platform Baseline: Reviews 1, 2, & 3 Completed)
 
 ---
 
 ## Decision Record 001: Separation of Frontend and Backend Services
 - **Status:** Approved
-- **Context:** The application requires high-performance spatial rendering in the browser while performing heavy multi-variate statistical aggregations, clustering, and ML payload validations.
-- **Decision:** Use **React 18 + Vite + TypeScript** for the client application shell and **Python FastAPI** for the analytics, data ingestion, and ML integration services.
-- **Consequences:** Provides clean separation of concerns, guarantees type safety across complex spatial schemas, and allows scientific Python packages (Pandas, Polars, Scikit-learn, Shapely) to handle analytics natively.
+- **Context:** High-performance spatial rendering in browser while performing multi-variate statistical aggregations and clustering.
+- **Decision:** Use React 18 + TypeScript + MapLibre GL for the web application shell and Python FastAPI for backend analytics.
 
 ---
 
 ## Decision Record 002: Mapping Engine Selection (MapLibre GL JS)
 - **Status:** Approved
-- **Context:** The platform requires hardware-accelerated vector polyline coloring for Chennai corridors, sub-millisecond click hit-testing, custom dark command center basemaps, and multiple dynamic overlay layers (congestion, accidents, flow, predictions).
-- **Decision:** Adopt **MapLibre GL JS** (open-source WebGL GIS rendering engine) as the core mapping technology.
-- **Consequences:** Delivers 60 FPS performance during panning and time-slider scrubbing, eliminates vendor lock-in, and natively supports GeoJSON vector line/point styling.
+- **Context:** Hardware-accelerated vector polyline coloring for Chennai corridors, sub-millisecond click hit-testing, and dynamic layer overlays.
+- **Decision:** Adopt MapLibre GL JS with custom dark command center basemap tiles.
 
 ---
 
-## Decision Record 003: Storage & Analytical Serialization (Parquet + GeoJSON)
+## Decision Record 003: Columnar Analytical Storage (Parquet & GeoJSON)
 - **Status:** Approved
-- **Context:** The application needs fast query times for time-sliced traffic data without requiring a complex PostgreSQL database setup during initial development phases.
-- **Decision:** Standardize on columnar **Apache Parquet** for analytical time-series records and standardized **GeoJSON** for spatial road geometries.
-- **Consequences:** Sub-second query times, minimal file size on disk, zero installation overhead for local development, and trivial forward migration to PostGIS if required in future releases.
+- **Context:** Fast queries for time-sliced traffic data without heavy SQL infrastructure.
+- **Decision:** Store canonical analytical series in Parquet and spatial road vectors in GeoJSON.
 
 ---
 
 ## Decision Record 004: Decoupled Machine Learning Contract
-- **Status:** Approved
-- **Context:** The ML model development is an independent workstream. The dashboard must consume model outputs without depending on PyTorch/TensorFlow runtime dependencies or training code.
-- **Decision:** Formalize a strict JSON schema contract (`docs/ml-integration.md` / `ml-contract/schema_prediction.json`) consumed via REST API or cached files.
-- **Consequences:** The dashboard can be fully tested and demonstrated with verified sample predictions; ML models can be swapped or upgraded without modifying a single line of frontend code.
+- **Status:** Approved (Phase 0 / Phase 9)
+- **Context:** Independent ML workstream without coupling model training frameworks to UI.
+- **Decision:** Consume predictions strictly via JSON Schema Draft-07 prediction contract (`docs/ml-integration.md`).
 
 ---
 
 ## Decision Record 005: Explicit Four-Tier Data State Tagging
 - **Status:** Approved
-- **Context:** Scientific integrity and authority trust require that users never confuse actual sensor measurements with calculated metrics, ML predictions, or synthetic fixtures.
-- **Decision:** Enforce 4 explicit states (`OBSERVED`, `DERIVED`, `PREDICTED`, `SIMULATED`) across data contracts, API payloads, and UI visual indicators.
-- **Consequences:** 100% transparent data lineage, compliant with Master PRD non-goals and academic defense scrutiny.
+- **Context:** Scientific integrity and authority transparency.
+- **Decision:** Enforce 4 explicit states (`OBSERVED`, `DERIVED`, `PREDICTED`, `SIMULATED`) across data contracts and UI badges.
+
+---
+
+## Decision Record 006: Dynamic Pearson Correlation & Statistical Association
+- **Status:** Approved (Phase 5)
+- **Context:** Master PRD explicitly mandates that statistical correlation must not be presented as direct causation.
+- **Decision:** Implement dynamic Pearson correlation across 5 dimensions ($V, S, U, \text{Rain}, \text{Accidents}$) with descriptive statistical association tooltips and explicit non-causal disclaimers.
+
+---
+
+## Decision Record 007: Dynamic Corridor Leaderboard Ranking
+- **Status:** Approved (Phase 5)
+- **Context:** Rankings must reflect active dataset and filter parameters rather than hard-coded strings.
+- **Decision:** Compute leaderboard rankings dynamically on the client and backend sorted by `congestion_index` descending, supporting one-click map camera fly-to interaction.
+
+---
+
+## Decision Record 008: Unsupervised K-Means Behavioral Clustering
+- **Status:** Approved (Review 2 / Phase 7)
+- **Context:** Master PRD strictly prohibits manually hardcoding roads to cluster groups.
+- **Decision:** Execute unsupervised K-Means clustering dynamically on extracted 5-dimensional feature vectors $[ \text{Peak } CI, \, \text{Off-Peak } CI, \, \text{Speed Variance}, \, \text{Rain Sensitivity}, \, \text{Accidents} ]$, with labels derived from centroid properties.
+
+---
+
+## Decision Record 009: Documented Multi-Factor Decision Support Priority Score
+- **Status:** Approved (Review 2 / Phase 8)
+- **Context:** Priority scoring must be mathematically justified and transparent before deployment.
+- **Decision:** Formulate Priority Score as:
+  $$PS = \min\left(100.0, \, 0.40 \cdot CI + 0.30 \cdot (R_v \cdot 100) + 0.20 \cdot \min(100, \text{Accidents} \times 50) + 0.10 \cdot (\text{Peak} ? 100 : 0)\right)$$
+  Document clearly that $PS$ is exclusively a decision support triage index for human operators, not an autonomous traffic control system.
+
+---
+
+## Decision Record 010: Multi-Horizon Predictive ML Adapter & Explainability
+- **Status:** Approved (Review 3 / Phase 9)
+- **Context:** Traffic authorities need proactive 15–60 minute lead time forecasts to deploy traffic wardens prior to peak gridlock.
+- **Decision:** Implement the `MLPredictionAdapter` providing spatio-temporal predictions (+15m, +30m, +45m, +60m), 95% confidence bounds, and SHAP feature importance driver weights in the Location Drawer.

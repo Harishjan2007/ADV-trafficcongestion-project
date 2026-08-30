@@ -1,0 +1,443 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "city": "Chennai",
+    "crs": "EPSG:4326 (WGS84)",
+    "description": "Chennai Metropolitan Area Major Arterial Network and Critical Junctions",
+    "updated_at": "2026-08-30"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ROAD_ANNA_SALAI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2764, 13.0805],
+          [80.2682, 13.0674],
+          [80.2573, 13.0562],
+          [80.2505, 13.0489]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_ANNA_SALAI_1",
+        "road_name": "Anna Salai (Central to Gemini)",
+        "zone": "Central Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 4200,
+        "lane_count": 4,
+        "key_landmarks": ["Chennai Central", "LIC Building", "Thousand Lights", "Gemini Flyover"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_ANNA_SALAI_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2505, 13.0489],
+          [80.2441, 13.0378],
+          [80.2335, 13.0242],
+          [80.2185, 13.0118]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_ANNA_SALAI_2",
+        "road_name": "Anna Salai (Gemini to Guindy)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 4000,
+        "lane_count": 4,
+        "key_landmarks": ["Teynampet", "Nandanam Signal", "Saidapet Bridge", "Guindy"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_GST_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2038, 13.0067],
+          [80.1882, 12.9915],
+          [80.1654, 12.9782],
+          [80.1448, 12.9612]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_GST_1",
+        "road_name": "GST Road (Kathipara to Airport)",
+        "zone": "South Zone",
+        "road_type": "Expressway",
+        "speed_limit": 60.0,
+        "road_capacity": 4800,
+        "lane_count": 4,
+        "key_landmarks": ["Kathipara Cloverleaf", "Chennai Airport", "Pallavaram"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_GST_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.1448, 12.9612],
+          [80.1385, 12.9465],
+          [80.1215, 12.9242]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_GST_2",
+        "road_name": "GST Road (Chromepet to Tambaram)",
+        "zone": "South Zone",
+        "road_type": "Expressway",
+        "speed_limit": 60.0,
+        "road_capacity": 4500,
+        "lane_count": 4,
+        "key_landmarks": ["Chromepet MIT", "Sanatorium", "Tambaram Flyover"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_OMR_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2482, 13.0076],
+          [80.2465, 12.9882],
+          [80.2442, 12.9654],
+          [80.2395, 12.9421]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_OMR_1",
+        "road_name": "OMR (Madhya Kailash to Thoraipakkam)",
+        "zone": "OMR IT Corridor",
+        "road_type": "Expressway",
+        "speed_limit": 60.0,
+        "road_capacity": 4500,
+        "lane_count": 3,
+        "key_landmarks": ["Madhya Kailash", "Tidel Park", "SRP Tools", "Thoraipakkam Toll"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_OMR_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2395, 12.9421],
+          [80.2312, 12.9015],
+          [80.2225, 12.8342]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_OMR_2",
+        "road_name": "OMR (Sholinganallur to Siruseri)",
+        "zone": "OMR IT Corridor",
+        "road_type": "Expressway",
+        "speed_limit": 60.0,
+        "road_capacity": 4200,
+        "lane_count": 3,
+        "key_landmarks": ["Sholinganallur Junction", "Navalur", "Siruseri SIPCOT IT Park"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_PH_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2785, 13.0825],
+          [80.2512, 13.0784],
+          [80.2285, 13.0742],
+          [80.2015, 13.0712]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_PH_1",
+        "road_name": "Poonamallee High Road (Central to Koyambedu)",
+        "zone": "North Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3800,
+        "lane_count": 3,
+        "key_landmarks": ["Chennai Central", "Kilpauk Medical College", "Aminjikarai", "Koyambedu Roundabout"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_PH_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2015, 13.0712],
+          [80.1712, 13.0645],
+          [80.1345, 13.0512],
+          [80.0985, 13.0425]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_PH_2",
+        "road_name": "Poonamallee High Road (Koyambedu to Poonamallee)",
+        "zone": "West Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3600,
+        "lane_count": 3,
+        "key_landmarks": ["Maduravoyal Grade Separator", "Vanagaram", "Poonamallee Bypass"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_100FT_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2015, 13.0712],
+          [80.2115, 13.0515],
+          [80.2142, 13.0345],
+          [80.2038, 13.0067]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_100FT_1",
+        "road_name": "Inner Ring Road / 100 Feet Rd (Koyambedu to Kathipara)",
+        "zone": "Central Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 4200,
+        "lane_count": 4,
+        "key_landmarks": ["Koyambedu CMBT", "Vadapalani Junction", "Ashok Pillar", "Ekkattuthangal", "Kathipara"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_ECR_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2585, 12.9852],
+          [80.2612, 12.9542],
+          [80.2635, 12.9215],
+          [80.2652, 12.8765]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_ECR_1",
+        "road_name": "East Coast Road (Thiruvanmiyur to Akkarai)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 60.0,
+        "road_capacity": 3400,
+        "lane_count": 2,
+        "key_landmarks": ["Thiruvanmiyur RTO", "Kottivakkam", "Neelankarai", "Akkarai Beach"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_MOUNT_POON_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2038, 13.0067],
+          [80.1785, 13.0182],
+          [80.1542, 13.0325],
+          [80.1345, 13.0415]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_MOUNT_POON_1",
+        "road_name": "Mount-Poonamallee Road (Guindy to Porur)",
+        "zone": "West Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3600,
+        "lane_count": 3,
+        "key_landmarks": ["Kathipara", "Butt Road", "DLF Cybercity", "Ramapuram", "Porur Roundabout"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_ARCOT_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2315, 13.0542],
+          [80.2115, 13.0515],
+          [80.1785, 13.0425],
+          [80.1542, 13.0325]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_ARCOT_1",
+        "road_name": "Arcot Road (Kodambakkam to Porur)",
+        "zone": "Central Zone",
+        "road_type": "Sub-Arterial",
+        "speed_limit": 40.0,
+        "road_capacity": 2800,
+        "lane_count": 2,
+        "key_landmarks": ["Kodambakkam Power House", "Vadapalani Murugan Temple", "Valasaravakkam", "Porur"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_SP_ROAD_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2185, 13.0118],
+          [80.2315, 13.0085],
+          [80.2482, 13.0076],
+          [80.2585, 13.0052]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_SP_ROAD_1",
+        "road_name": "Sardar Patel Road (Guindy to Adyar)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3500,
+        "lane_count": 3,
+        "key_landmarks": ["Raj Bhavan", "Anna University", "IIT Madras Gate", "Madhya Kailash", "Adyar Signal"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_MARINA_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [80.2852, 13.0725],
+          [80.2825, 13.0515],
+          [80.2785, 13.0325],
+          [80.2762, 13.0185]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_MARINA_1",
+        "road_name": "Kamarajar Salai / Marina Promenade",
+        "zone": "Central Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3200,
+        "lane_count": 3,
+        "key_landmarks": ["Napier Bridge", "Marina Lighthouse", "Santhome Basilica", "Foreshore Estate"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_KATHIPARA",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2038, 13.0067]
+      },
+      "properties": {
+        "junction_id": "JUNC_KATHIPARA",
+        "junction_name": "Kathipara Grade Separator (Cloverleaf)",
+        "zone": "South Zone",
+        "type": "Major Interchange",
+        "connecting_corridors": ["Anna Salai", "GST Road", "100 Feet Road", "Mount-Poonamallee Road"],
+        "criticality": "Critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_KOYAMBEDU",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2015, 13.0712]
+      },
+      "properties": {
+        "junction_id": "JUNC_KOYAMBEDU",
+        "junction_name": "Koyambedu Roundabout / CMBT Jn",
+        "zone": "North Zone",
+        "type": "Major Interchange",
+        "connecting_corridors": ["Poonamallee High Road", "Inner Ring Road"],
+        "criticality": "High"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_MADHYA_KAILASH",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2482, 13.0076]
+      },
+      "properties": {
+        "junction_id": "JUNC_MADHYA_KAILASH",
+        "junction_name": "Madhya Kailash Junction",
+        "zone": "OMR IT Corridor",
+        "type": "Major Intersection",
+        "connecting_corridors": ["Sardar Patel Road", "OMR (Rajiv Gandhi Salai)", "Adyar Bridge"],
+        "criticality": "High"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_GEMINI",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2505, 13.0489]
+      },
+      "properties": {
+        "junction_id": "JUNC_GEMINI",
+        "junction_name": "Gemini (Anna Flyover) Junction",
+        "zone": "Central Zone",
+        "type": "Flyover Intersection",
+        "connecting_corridors": ["Anna Salai", "Nungambakkam High Road", "Cathedral Road"],
+        "criticality": "High"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_SHOLINGANALLUR",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2312, 12.9015]
+      },
+      "properties": {
+        "junction_id": "JUNC_SHOLINGANALLUR",
+        "junction_name": "Sholinganallur Signal Junction",
+        "zone": "OMR IT Corridor",
+        "type": "Major Intersection",
+        "connecting_corridors": ["OMR", "Medavakkam-Sholinganallur Link Road", "ECR Link Rd"],
+        "criticality": "Critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VADAPALANI",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2115, 13.0515]
+      },
+      "properties": {
+        "junction_id": "JUNC_VADAPALANI",
+        "junction_name": "Vadapalani Junction",
+        "zone": "Central Zone",
+        "type": "Major Flyover & Metro Interchange",
+        "connecting_corridors": ["100 Feet Road", "Arcot Road"],
+        "criticality": "High"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_GUINDY",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2185, 13.0118]
+      },
+      "properties": {
+        "junction_id": "JUNC_GUINDY",
+        "junction_name": "Guindy Circle / Railway Station Jn",
+        "zone": "South Zone",
+        "type": "Major Hub",
+        "connecting_corridors": ["Anna Salai", "Sardar Patel Road", "GST Road"],
+        "criticality": "High"
+      }
+    }
+  ]
+}

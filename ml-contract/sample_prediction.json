@@ -1,0 +1,53 @@
+[
+  {
+    "location_id": "ROAD_ANNA_SALAI_1",
+    "prediction_timestamp": "2026-08-30T09:00:00+05:30",
+    "prediction_horizon": "30min",
+    "predicted_congestion_level": "Severe",
+    "predicted_congestion_index": 88.4,
+    "predicted_vehicle_count": 4250,
+    "predicted_speed": 10.5,
+    "confidence": 0.89,
+    "model_version": "ST-GCN-Chennai-v2.1",
+    "top_contributing_features": [
+      {
+        "feature_name": "Rainfall Intensity (mm/hr)",
+        "importance_score": 0.42,
+        "direction": "increases_congestion"
+      },
+      {
+        "feature_name": "Upstream Inflow (Central/LIC)",
+        "importance_score": 0.31,
+        "direction": "increases_congestion"
+      },
+      {
+        "feature_name": "Morning Peak Commute Wave",
+        "importance_score": 0.18,
+        "direction": "increases_congestion"
+      }
+    ]
+  },
+  {
+    "location_id": "ROAD_GST_1",
+    "prediction_timestamp": "2026-08-30T09:00:00+05:30",
+    "prediction_horizon": "30min",
+    "predicted_congestion_level": "Severe",
+    "predicted_congestion_index": 91.2,
+    "predicted_vehicle_count": 4850,
+    "predicted_speed": 12.0,
+    "confidence": 0.92,
+    "model_version": "ST-GCN-Chennai-v2.1",
+    "top_contributing_features": [
+      {
+        "feature_name": "Kathipara Grade Separator Inflow",
+        "importance_score": 0.48,
+        "direction": "increases_congestion"
+      },
+      {
+        "feature_name": "Active Incident Lag",
+        "importance_score": 0.35,
+        "direction": "increases_congestion"
+      }
+    ]
+  }
+]

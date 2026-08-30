@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "dataset_name": "Chennai Urban Traffic Multi-Corridor Calibrated Fixture",
+    "version": "1.0.0",
+    "is_simulated": true,
+    "watermark": "SIMULATED DEVELOPMENT FIXTURE - NOT OFFICIAL POLICE RECORDS",
+    "temporal_scope": "2026-08-30 (24-Hour Cycle)",
+    "corridor_count": 13,
+    "junction_count": 7
+  },
+  "corridors": [
+    {
+      "road_id": "ROAD_ANNA_SALAI_1",
+      "road_name": "Anna Salai (Central to Gemini)",
+      "zone": "Central Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 4200,
+      "lane_count": 4,
+      "base_volume": 3200,
+      "hourly_profiles": {
+        "0": {"vehicle_count": 420, "average_speed": 48.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "1": {"vehicle_count": 280, "average_speed": 49.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "2": {"vehicle_count": 190, "average_speed": 50.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "3": {"vehicle_count": 220, "average_speed": 49.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "4": {"vehicle_count": 450, "average_speed": 47.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "5": {"vehicle_count": 980, "average_speed": 44.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "6": {"vehicle_count": 1850, "average_speed": 38.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "7": {"vehicle_count": 2980, "average_speed": 26.0, "weather": "Light Rain", "rain": 2.5, "accidents": 0},
+        "8": {"vehicle_count": 3890, "average_speed": 14.5, "weather": "Moderate Rain", "rain": 6.8, "accidents": 1, "accident_severity": "Minor"},
+        "9": {"vehicle_count": 4120, "average_speed": 11.2, "weather": "Moderate Rain", "rain": 5.4, "accidents": 1, "accident_severity": "Minor"},
+        "10": {"vehicle_count": 3450, "average_speed": 21.0, "weather": "Cloudy", "rain": 0.5, "accidents": 0},
+        "11": {"vehicle_count": 2800, "average_speed": 28.5, "weather": "Cloudy", "rain": 0.0, "accidents": 0},
+        "12": {"vehicle_count": 2650, "average_speed": 31.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "13": {"vehicle_count": 2400, "average_speed": 34.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "14": {"vehicle_count": 2550, "average_speed": 32.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "15": {"vehicle_count": 2890, "average_speed": 29.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "16": {"vehicle_count": 3350, "average_speed": 23.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "17": {"vehicle_count": 3950, "average_speed": 15.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "18": {"vehicle_count": 4180, "average_speed": 12.0, "weather": "Clear", "rain": 0.0, "accidents": 1, "accident_severity": "Major"},
+        "19": {"vehicle_count": 4050, "average_speed": 13.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "20": {"vehicle_count": 3200, "average_speed": 24.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "21": {"vehicle_count": 2300, "average_speed": 33.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "22": {"vehicle_count": 1450, "average_speed": 40.5, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "23": {"vehicle_count": 820, "average_speed": 46.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_ANNA_SALAI_2",
+      "road_name": "Anna Salai (Gemini to Guindy)",
+      "zone": "South Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 4000,
+      "lane_count": 4,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 3720, "average_speed": 16.5, "weather": "Moderate Rain", "rain": 6.8, "accidents": 0},
+        "9": {"vehicle_count": 3950, "average_speed": 13.0, "weather": "Moderate Rain", "rain": 5.4, "accidents": 1, "accident_severity": "Minor"},
+        "18": {"vehicle_count": 3980, "average_speed": 14.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_GST_1",
+      "road_name": "GST Road (Kathipara to Airport)",
+      "zone": "South Zone",
+      "road_type": "Expressway",
+      "speed_limit": 60.0,
+      "road_capacity": 4800,
+      "lane_count": 4,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 4620, "average_speed": 18.0, "weather": "Moderate Rain", "rain": 7.2, "accidents": 2, "accident_severity": "Major"},
+        "9": {"vehicle_count": 4790, "average_speed": 14.5, "weather": "Light Rain", "rain": 3.1, "accidents": 1, "accident_severity": "Minor"},
+        "18": {"vehicle_count": 4650, "average_speed": 19.0, "weather": "Clear", "rain": 0.0, "accidents": 1, "accident_severity": "Minor"}
+      }
+    },
+    {
+      "road_id": "ROAD_OMR_1",
+      "road_name": "OMR (Madhya Kailash to Thoraipakkam)",
+      "zone": "OMR IT Corridor",
+      "road_type": "Expressway",
+      "speed_limit": 60.0,
+      "road_capacity": 4500,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 4350, "average_speed": 15.5, "weather": "Light Rain", "rain": 4.0, "accidents": 1, "accident_severity": "Minor"},
+        "9": {"vehicle_count": 4480, "average_speed": 12.5, "weather": "Light Rain", "rain": 3.0, "accidents": 0},
+        "18": {"vehicle_count": 4420, "average_speed": 16.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "19": {"vehicle_count": 4310, "average_speed": 17.5, "weather": "Clear", "rain": 0.0, "accidents": 1, "accident_severity": "Minor"}
+      }
+    },
+    {
+      "road_id": "ROAD_OMR_2",
+      "road_name": "OMR (Sholinganallur to Siruseri)",
+      "zone": "OMR IT Corridor",
+      "road_type": "Expressway",
+      "speed_limit": 60.0,
+      "road_capacity": 4200,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 3950, "average_speed": 19.5, "weather": "Light Rain", "rain": 3.5, "accidents": 0},
+        "9": {"vehicle_count": 4120, "average_speed": 16.0, "weather": "Light Rain", "rain": 2.0, "accidents": 1, "accident_severity": "Major"},
+        "18": {"vehicle_count": 4080, "average_speed": 18.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_100FT_1",
+      "road_name": "Inner Ring Road / 100 Feet Rd (Koyambedu to Kathipara)",
+      "zone": "Central Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 4200,
+      "lane_count": 4,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 4050, "average_speed": 13.0, "weather": "Moderate Rain", "rain": 6.5, "accidents": 1, "accident_severity": "Major"},
+        "9": {"vehicle_count": 4180, "average_speed": 11.5, "weather": "Light Rain", "rain": 4.0, "accidents": 0},
+        "18": {"vehicle_count": 4120, "average_speed": 12.8, "weather": "Clear", "rain": 0.0, "accidents": 1, "accident_severity": "Minor"}
+      }
+    },
+    {
+      "road_id": "ROAD_PH_1",
+      "road_name": "Poonamallee High Road (Central to Koyambedu)",
+      "zone": "North Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 3800,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 3650, "average_speed": 15.0, "weather": "Light Rain", "rain": 3.0, "accidents": 0},
+        "9": {"vehicle_count": 3780, "average_speed": 12.0, "weather": "Light Rain", "rain": 2.5, "accidents": 1, "accident_severity": "Minor"},
+        "18": {"vehicle_count": 3720, "average_speed": 14.5, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_MOUNT_POON_1",
+      "road_name": "Mount-Poonamallee Road (Guindy to Porur)",
+      "zone": "West Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 3600,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 3480, "average_speed": 14.0, "weather": "Moderate Rain", "rain": 5.8, "accidents": 1, "accident_severity": "Minor"},
+        "9": {"vehicle_count": 3550, "average_speed": 12.5, "weather": "Light Rain", "rain": 3.2, "accidents": 0},
+        "18": {"vehicle_count": 3520, "average_speed": 13.5, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_ECR_1",
+      "road_name": "East Coast Road (Thiruvanmiyur to Akkarai)",
+      "zone": "South Zone",
+      "road_type": "Arterial",
+      "speed_limit": 60.0,
+      "road_capacity": 3400,
+      "lane_count": 2,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 2100, "average_speed": 42.0, "weather": "Light Rain", "rain": 4.5, "accidents": 0},
+        "9": {"vehicle_count": 2350, "average_speed": 38.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "18": {"vehicle_count": 2850, "average_speed": 32.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_ARCOT_1",
+      "road_name": "Arcot Road (Kodambakkam to Porur)",
+      "zone": "Central Zone",
+      "road_type": "Sub-Arterial",
+      "speed_limit": 40.0,
+      "road_capacity": 2800,
+      "lane_count": 2,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 2680, "average_speed": 12.0, "weather": "Moderate Rain", "rain": 6.0, "accidents": 0},
+        "9": {"vehicle_count": 2750, "average_speed": 10.5, "weather": "Light Rain", "rain": 2.5, "accidents": 1, "accident_severity": "Minor"},
+        "18": {"vehicle_count": 2720, "average_speed": 11.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_SP_ROAD_1",
+      "road_name": "Sardar Patel Road (Guindy to Adyar)",
+      "zone": "South Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 3500,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 3320, "average_speed": 17.0, "weather": "Light Rain", "rain": 3.8, "accidents": 0},
+        "9": {"vehicle_count": 3450, "average_speed": 14.5, "weather": "Light Rain", "rain": 2.0, "accidents": 0},
+        "18": {"vehicle_count": 3390, "average_speed": 16.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    },
+    {
+      "road_id": "ROAD_MARINA_1",
+      "road_name": "Kamarajar Salai / Marina Promenade",
+      "zone": "Central Zone",
+      "road_type": "Arterial",
+      "speed_limit": 50.0,
+      "road_capacity": 3200,
+      "lane_count": 3,
+      "hourly_profiles": {
+        "8": {"vehicle_count": 1850, "average_speed": 36.5, "weather": "Light Rain", "rain": 4.0, "accidents": 0},
+        "9": {"vehicle_count": 2100, "average_speed": 34.0, "weather": "Clear", "rain": 0.0, "accidents": 0},
+        "18": {"vehicle_count": 2980, "average_speed": 22.0, "weather": "Clear", "rain": 0.0, "accidents": 0}
+      }
+    }
+  ]
+}

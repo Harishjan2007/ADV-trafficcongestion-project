@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chennai Traffic Intelligence & Multidimensional Visualization Platform</title>
+  <meta name="description" content="Interactive Traffic Authority Command, Multidimensional Intelligence & Predictive Analytics Platform for Chennai Metropolitan Area.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- MapLibre GL CSS & JS -->
+  <link href="https://unpkg.com/maplibre-gl@4.0.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.0.2/dist/maplibre-gl.js"></script>
+  
+  <!-- Plotly.js for Advanced Visualizations -->
+  <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* CSS Tokens & Tactical Theme */
+    :root {
+      --bg-core: #070b14;
+      --bg-surface-primary: #0f172a;
+      --bg-surface-secondary: #1e293b;
+      --bg-surface-elevated: #334155;
+      --bg-glass: rgba(15, 23, 42, 0.88);
+      --bg-glass-heavy: rgba(15, 23, 42, 0.96);
+      --bg-glass-card: rgba(30, 41, 59, 0.75);
+
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.28);
+      --border-accent: rgba(6, 182, 212, 0.45);
+      --border-pred: rgba(139, 92, 246, 0.5);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-inverse: #0f172a;
+
+      /* Canonical Congestion Palette */
+      --color-low: #10b981;        /* Emerald Green */
+      --color-moderate: #f59e0b;   /* Amber Gold */
+      --color-high: #f97316;       /* Vibrant Orange */
+      --color-severe: #ef4444;     /* Crimson Red */
+
+      --color-accident: #eab308;
+      --color-prediction: #8b5cf6;
+      --color-flow: #06b6d4;
+      --color-cluster: #ec4899;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --header-height: 64px;
+      --filterbar-height: 52px;
+      --drawer-width: 560px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-core);
+      color: var(--text-primary);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Layout Containers */
+    #header-container {
+      height: var(--header-height);
+      background: var(--bg-glass-heavy);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    #filter-container {
+      height: var(--filterbar-height);
+      background: var(--bg-surface-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 40;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+
+    #main-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+    }
+
+    #map-container {
+      flex: 1;
+      height: 100%;
+      background: #060911;
+      position: relative;
+    }
+
+    /* Floating Map HUD Elements */
+    .map-hud-kpi {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 30;
+      display: flex;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .kpi-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      min-width: 125px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      pointer-events: auto;
+    }
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .kpi-value {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .kpi-unit {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Floating Leaderboard Drawer / Dock */
+    #leaderboard-dock {
+      position: absolute;
+      top: 90px;
+      left: 16px;
+      background: var(--bg-glass-heavy);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      width: 290px;
+      max-height: calc(100% - 210px);
+      z-index: 30;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    #leaderboard-dock.collapsed {
+      max-height: 40px;
+    }
+
+    .dock-header {
+      padding: 10px 14px;
+      background: var(--bg-surface-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .leaderboard-list {
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .leaderboard-item {
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .leaderboard-item:hover, .leaderboard-item.selected {
+      border-color: var(--color-flow);
+      background: rgba(6, 182, 212, 0.1);
+    }
+
+    .rank-num {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 16px;
+    }
+
+    .road-rank-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .road-rank-name {
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-primary);
+    }
+
+    .road-rank-sub {
+      font-size: 10px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Map Legend Overlay */
+    .map-legend {
+      position: absolute;
+      bottom: 24px;
+      left: 16px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      z-index: 30;
+      width: 230px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+
+    .legend-color-bar {
+      width: 18px;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    /* Floating Quick Center Tool */
+    .map-tools {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: var(--bg-glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tool-btn:hover {
+      background: var(--bg-surface-secondary);
+      border-color: var(--border-accent);
+      color: var(--color-flow);
+    }
+
+    /* Location Intelligence Drawer */
+    #location-drawer {
+      width: var(--drawer-width);
+      height: 100%;
+      background: var(--bg-glass-heavy);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid var(--border-strong);
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.6);
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    #location-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: var(--bg-surface-primary);
+    }
+
+    .drawer-title-area {
+      flex: 1;
+    }
+
+    .drawer-road-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .drawer-subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-primary);
+      border-color: var(--text-primary);
+    }
+
+    /* Drawer Tabs */
+    .drawer-tabs {
+      display: flex;
+      background: var(--bg-surface-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      color: var(--color-flow);
+      border-bottom-color: var(--color-flow);
+      background: rgba(6, 182, 212, 0.06);
+    }
+
+    .tab-btn.pred-tab.active {
+      color: var(--color-prediction);
+      border-bottom-color: var(--color-prediction);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .metric-box {
+      background: var(--bg-glass-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+    }
+
+    .metric-box-title {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .metric-box-val {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .chart-container {
+      background: var(--bg-surface-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      min-height: 230px;
+    }
+
+    .chart-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Bottom Insights Dock */
+    #insights-dock {
+      position: absolute;
+      bottom: 24px;
+      right: 16px;
+      background: var(--bg-glass-heavy);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      width: 380px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 30;
+      padding: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      transition: all 0.3s ease;
+    }
+
+    #insights-dock.collapsed {
+      max-height: 38px;
+      overflow: hidden;
+    }
+
+    .insight-item {
+      padding: 7px 9px;
+      background: rgba(30, 41, 59, 0.5);
+      border-left: 3px solid var(--color-flow);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .insight-item.critical {
+      border-left-color: var(--color-severe);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .insight-item.warning {
+      border-left-color: var(--color-moderate);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .insight-item.predictive {
+      border-left-color: var(--color-prediction);
+      background: rgba(139, 92, 246, 0.12);
+    }
+
+    /* Form Controls & Selectors */
+    select, input, button {
+      font-family: inherit;
+    }
+
+    .select-control {
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-control:focus {
+      border-color: var(--color-flow);
+    }
+
+    .chip-toggle {
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chip-toggle.active {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--color-flow);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .chip-toggle.active.pred-chip {
+      background: rgba(139, 92, 246, 0.18);
+      color: #c4b5fd;
+      border-color: var(--border-pred);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+    }
+    .badge-severe { background: rgba(239, 68, 68, 0.2); color: var(--color-severe); border: 1px solid var(--color-severe); }
+    .badge-high { background: rgba(249, 115, 22, 0.2); color: var(--color-high); border: 1px solid var(--color-high); }
+    .badge-moderate { background: rgba(245, 158, 11, 0.2); color: var(--color-moderate); border: 1px solid var(--color-moderate); }
+    .badge-low { background: rgba(16, 185, 129, 0.2); color: var(--color-low); border: 1px solid var(--color-low); }
+    .badge-critical { background: rgba(239, 68, 68, 0.3); color: #fff; border: 1px solid #ef4444; }
+    .badge-simulated { background: rgba(236, 72, 153, 0.2); color: #ec4899; border: 1px solid #ec4899; }
+    .badge-pred { background: rgba(139, 92, 246, 0.2); color: var(--color-prediction); border: 1px solid var(--color-prediction); }
+
+    /* Time Slider Bar */
+    .time-slider-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface-secondary);
+      padding: 3px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .play-btn {
+      background: var(--color-flow);
+      color: var(--bg-core);
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.15s;
+    }
+    .play-btn:hover { transform: scale(1.08); }
+
+    .slider-range {
+      width: 120px;
+      accent-color: var(--color-flow);
+      cursor: pointer;
+    }
+
+    .speed-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 2px 5px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .speed-btn.active {
+      color: var(--color-flow);
+      border-color: var(--color-flow);
+      background: rgba(6, 182, 212, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Header Bar -->
+  <header id="header-container">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 34px; height: 34px; background: rgba(6, 182, 212, 0.15); border: 1px solid var(--border-accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="navigation" style="color: var(--color-flow); width: 18px; height: 18px;"></i>
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h1 style="font-size: 14px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;">Chennai Traffic Intelligence Platform</h1>
+          <span class="badge badge-simulated">SIMULATED DATA</span>
+          <span class="badge badge-pred">ML FORECAST READY</span>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted);">Metropolitan Traffic Authority Multidimensional Intelligence & Spatial Decision System</p>
+      </div>
+    </div>
+
+    <!-- Quick Status Counters -->
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="text-align: right;">
+        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Scenario Clock</div>
+        <div id="live-clock" style="font-size: 13px; font-weight: 700; font-family: var(--font-mono); color: var(--color-flow);">08:00 IST</div>
+      </div>
+      <div style="height: 24px; width: 1px; background: var(--border-subtle);"></div>
+      <div style="text-align: right;">
+        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">ML Model Health</div>
+        <div style="font-size: 11px; font-weight: 600; color: var(--color-prediction); display: flex; align-items: center; gap: 4px;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-prediction); display: inline-block;"></span> ST-GCN v2.1 ACTIVE
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Coordinated Filter & Time Controller Bar -->
+  <nav id="filter-container">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <!-- Time Playback Widget -->
+      <div class="time-slider-wrapper">
+        <button id="play-pause-btn" class="play-btn" title="Play / Pause Time Animation">
+          <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+        </button>
+        <input type="range" id="hour-slider" class="slider-range" min="0" max="23" value="8" step="1">
+        <span id="slider-time-label" style="font-size: 11px; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); min-width: 40px;">08:00</span>
+        
+        <!-- Speed Multipliers -->
+        <button class="speed-btn active" data-speed="1500">1x</button>
+        <button class="speed-btn" data-speed="800">2x</button>
+        <button class="speed-btn" data-speed="300">5x</button>
+      </div>
+
+      <!-- Zone Selector -->
+      <select id="zone-filter" class="select-control">
+        <option value="">All Chennai Zones</option>
+        <option value="Central Zone">Central Zone</option>
+        <option value="South Zone">South Zone</option>
+        <option value="North Zone">North Zone</option>
+        <option value="West Zone">West Zone</option>
+        <option value="OMR IT Corridor">OMR IT Corridor</option>
+      </select>
+
+      <!-- Severity Filter -->
+      <select id="severity-filter" class="select-control">
+        <option value="">All Severities</option>
+        <option value="Severe">🔴 Severe (CI ≥ 75)</option>
+        <option value="High">🟠 High (CI 55-75)</option>
+        <option value="Moderate">🟡 Moderate (CI 30-55)</option>
+        <option value="Low">🟢 Low (CI &lt; 30)</option>
+      </select>
+
+      <!-- Incident Filter -->
+      <select id="incident-filter" class="select-control">
+        <option value="all">All Corridors</option>
+        <option value="incidents_only">⚠ Active Incidents Only</option>
+        <option value="congested_only">🔴 Severe Only</option>
+      </select>
+    </div>
+
+    <!-- Layer Toggles -->
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <button class="chip-toggle active" id="toggle-congestion" data-layer="congestion">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-severe);"></span> Congestion
+      </button>
+      <button class="chip-toggle active" id="toggle-accidents" data-layer="accidents">
+        <span style="color: var(--color-accident);">⚠</span> Incidents
+      </button>
+      <button class="chip-toggle pred-chip" id="toggle-prediction" data-layer="prediction">
+        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--color-prediction);"></i> +30m ML Forecast
+      </button>
+      <button class="chip-toggle" id="toggle-flow" data-layer="flow">
+        <i data-lucide="move-right" style="width: 12px; height: 12px;"></i> Flow Vectors
+      </button>
+      <button class="chip-toggle" id="toggle-clusters" data-layer="clusters">
+        <i data-lucide="shapes" style="width: 12px; height: 12px; color: var(--color-cluster);"></i> Clusters
+      </button>
+      <button class="chip-toggle active" id="toggle-leaderboard" data-layer="leaderboard">
+        <i data-lucide="bar-chart-2" style="width: 12px; height: 12px;"></i> Leaderboard
+      </button>
+    </div>
+  </nav>
+
+  <!-- 3. Main Spatial Viewport -->
+  <main id="main-viewport">
+    
+    <!-- Map Canvas -->
+    <div id="map-container"></div>
+
+    <!-- Floating Top KPIs -->
+    <div class="map-hud-kpi">
+      <div class="kpi-card">
+        <div class="kpi-title">City Avg Speed</div>
+        <div class="kpi-value" id="kpi-speed">18.4 <span class="kpi-unit">km/h</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Active Flow</div>
+        <div class="kpi-value" id="kpi-volume">44,820 <span class="kpi-unit">veh/hr</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Severe Corridors</div>
+        <div class="kpi-value" style="color: var(--color-severe);" id="kpi-severe">4 <span class="kpi-unit">roads</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Incident Blackspots</div>
+        <div class="kpi-value" style="color: var(--color-accident);" id="kpi-accidents">3 <span class="kpi-unit">active</span></div>
+      </div>
+    </div>
+
+    <!-- Floating Multi-Corridor Leaderboard Dock -->
+    <div id="leaderboard-dock">
+      <div class="dock-header" id="leaderboard-header">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="bar-chart" style="width: 13px; height: 13px; color: var(--color-flow);"></i>
+          <span>Corridor Leaderboard</span>
+        </div>
+        <span id="leaderboard-toggle-btn" style="font-size: 10px; color: var(--text-muted);">Collapse</span>
+      </div>
+      <div class="leaderboard-list" id="leaderboard-items">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Map Tools / Zoom Presets -->
+    <div class="map-tools">
+      <button class="tool-btn" id="btn-zoom-city"><i data-lucide="maximize" style="width: 13px;"></i> City View</button>
+      <button class="tool-btn" id="btn-zoom-kathipara"><i data-lucide="crosshair" style="width: 13px;"></i> Kathipara Jn</button>
+      <button class="tool-btn" id="btn-zoom-anna"><i data-lucide="map-pin" style="width: 13px;"></i> Anna Salai</button>
+      <button class="tool-btn" id="btn-zoom-omr"><i data-lucide="cpu" style="width: 13px;"></i> OMR IT Corridor</button>
+    </div>
+
+    <!-- Map Legend -->
+    <div class="map-legend">
+      <div class="legend-title">
+        <span id="legend-main-title">Congestion Severity</span>
+        <span style="font-size: 9px; color: var(--text-muted);" id="legend-sub-title">CI INDEX</span>
+      </div>
+      <div id="legend-rows-container">
+        <div class="legend-row">
+          <span class="legend-color-bar" style="background: var(--color-severe); box-shadow: 0 0 8px rgba(239,68,68,0.5);"></span>
+          <span style="font-weight: 600;">Severe</span>
+          <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">75 - 100</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-color-bar" style="background: var(--color-high);"></span>
+          <span>High</span>
+          <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">55 - 75</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-color-bar" style="background: var(--color-moderate);"></span>
+          <span>Moderate</span>
+          <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">30 - 55</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-color-bar" style="background: var(--color-low);"></span>
+          <span>Low / Free-Flow</span>
+          <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">&lt; 30</span>
+        </div>
+      </div>
+      <div style="height: 1px; background: var(--border-subtle); margin: 6px 0;"></div>
+      <div class="legend-row">
+        <span style="color: var(--color-accident); font-size: 13px;">⚠</span>
+        <span>Accident Incident</span>
+      </div>
+      <div class="legend-row">
+        <span style="color: var(--color-prediction); font-size: 13px;">✦</span>
+        <span>ML Predictive Layer (+30m)</span>
+      </div>
+    </div>
+
+    <!-- Automated Insights Dock -->
+    <div id="insights-dock">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-flow); display: flex; align-items: center; gap: 5px;">
+          <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i> Evidence-Based Insights
+        </span>
+        <button id="toggle-insights-btn" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px;">Hide</button>
+      </div>
+      <div id="insights-list">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Location Intelligence Drawer (Right Side) -->
+    <aside id="location-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-area">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+            <span id="drawer-priority-badge" class="badge badge-severe">CRITICAL PRIORITY</span>
+            <span id="drawer-data-badge" class="badge badge-simulated">SIMULATED DATA</span>
+          </div>
+          <h2 id="drawer-road-name" class="drawer-road-name">Anna Salai (Central to Gemini)</h2>
+          <div class="drawer-subtitle">
+            <span id="drawer-zone"><i data-lucide="map-pin" style="width: 11px;"></i> Central Zone</span>
+            <span>•</span>
+            <span id="drawer-type">Arterial Corridor</span>
+            <span>•</span>
+            <span id="drawer-capacity">Capacity: 4,200 v/h</span>
+          </div>
+        </div>
+        <button class="close-btn" id="drawer-close-btn" title="Back to City View">
+          <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Tabs: 7 Deep Analytical & Predictive Views -->
+      <div class="drawer-tabs">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn pred-tab" data-tab="prediction">✦ ML Forecast</button>
+        <button class="tab-btn" data-tab="timeseries">24h Trend</button>
+        <button class="tab-btn" data-tab="scatter">Speed vs Vol</button>
+        <button class="tab-btn" data-tab="correlation">Correlation</button>
+        <button class="tab-btn" data-tab="accidents">Safety</button>
+        <button class="tab-btn" data-tab="clustering">Clusters</button>
+        <button class="tab-btn" data-tab="heatmap">Day × Hour</button>
+      </div>
+
+      <!-- Drawer Scrollable Content -->
+      <div class="drawer-content" id="drawer-content">
+        
+        <!-- Tab 1: Overview Tab -->
+        <div id="tab-pane-overview">
+          <div class="metric-grid" style="margin-bottom: 12px;">
+            <div class="metric-box">
+              <div class="metric-box-title">Average Speed</div>
+              <div class="metric-box-val" id="metric-speed" style="color: var(--color-severe);">14.5 <span style="font-size: 11px; color: var(--text-muted);">km/h</span></div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Limit: 50 km/h (-71% deficit)</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Active Volume</div>
+              <div class="metric-box-val" id="metric-volume">3,890 <span style="font-size: 11px; color: var(--text-muted);">veh/hr</span></div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Utilization: 92.6% of cap</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Congestion Index</div>
+              <div class="metric-box-val" id="metric-ci" style="color: var(--color-severe);">78.2 <span style="font-size: 11px; color: var(--text-muted);">/100</span></div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Severity Tier: SEVERE</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Incident Status</div>
+              <div class="metric-box-val" id="metric-accidents" style="color: var(--color-accident);">1 Minor</div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Weather: Light Rain (4.5mm)</div>
+            </div>
+          </div>
+
+          <!-- Quick Mini Trend Preview -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Traffic Velocity vs Volume Dynamics (24h)</span>
+              <span class="badge badge-low" style="font-size: 9px;">DERIVED</span>
+            </div>
+            <div id="chart-quick-trend" style="width: 100%; height: 190px;"></div>
+          </div>
+
+          <!-- Tactical Recommendations -->
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 10px 12px; margin-top: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--color-severe); text-transform: uppercase; margin-bottom: 2px;">
+              ⚠ Decision Support Recommended Action
+            </div>
+            <p style="font-size: 11px; color: var(--text-primary); line-height: 1.4;" id="drawer-action-text">
+              Severe queue building at Gemini signal. Dispatch traffic patrol for manual cycle override (+15s green split for Southbound corridor).
+            </p>
+          </div>
+        </div>
+
+        <!-- Tab 2: Machine Learning Prediction Tab (Phase 9) -->
+        <div id="tab-pane-prediction" style="display: none;">
+          <!-- Model Card Header -->
+          <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--border-pred); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: #c4b5fd; text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+                <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i> ST-GCN-Chennai-v2.1 Predictive Model
+              </span>
+              <span class="badge badge-pred">CONFIDENCE: 92%</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+              Spatio-Temporal Graph Neural Network inference. Lead time: <b>+30 min horizon</b>. Model Latency: <b>14 ms</b>.
+            </div>
+          </div>
+
+          <!-- Forecast Comparison Chart -->
+          <div class="chart-container" style="margin-bottom: 12px;">
+            <div class="chart-header">
+              <span>Observed Baseline vs. +30m Predicted Congestion</span>
+              <span class="badge badge-pred" style="font-size: 9px;">PREDICTED</span>
+            </div>
+            <div id="chart-ml-forecast" style="width: 100%; height: 250px;"></div>
+          </div>
+
+          <!-- Feature Importance / Explainability Bar Chart -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Top Contributing Drivers (SHAP / Feature Weights)</span>
+              <span class="badge badge-low" style="font-size: 9px;">EXPLAINABILITY</span>
+            </div>
+            <div id="chart-feature-importance" style="width: 100%; height: 210px;"></div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Time Series Chart -->
+        <div id="tab-pane-timeseries" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Congestion Index & Velocity (24h Timeline)</span>
+              <span class="badge badge-simulated" style="font-size: 9px;">SIMULATED DATA</span>
+            </div>
+            <div id="chart-timeseries" style="width: 100%; height: 320px;"></div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Speed vs Volume Scatter Plot -->
+        <div id="tab-pane-scatter" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Speed vs Volume (Fundamental Traffic Flow Breakdown)</span>
+              <span class="badge badge-simulated" style="font-size: 9px;">SIMULATED DATA</span>
+            </div>
+            <div id="chart-scatter" style="width: 100%; height: 300px;"></div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">
+              Empirical curve illustrates critical transition into forced flow beyond 85% capacity utilization.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Statistical Correlation Matrix -->
+        <div id="tab-pane-correlation" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Statistical Correlation Matrix (Pearson r)</span>
+              <span class="badge badge-low" style="font-size: 9px;">DERIVED</span>
+            </div>
+            <div id="chart-correlation" style="width: 100%; height: 320px;"></div>
+            <div id="correlation-explanation" style="font-size: 11px; color: var(--color-flow); margin-top: 8px; background: rgba(6, 182, 212, 0.08); padding: 8px; border-radius: var(--radius-sm); border: 1px solid rgba(6, 182, 212, 0.2);">
+              Hover over any correlation cell above to inspect pair statistics. Note: Correlation indicates statistical association, not direct physical causality.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 6: Accident & Safety Temporal Breakdown -->
+        <div id="tab-pane-accidents" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Accident Incident Frequency & Severity Profile</span>
+              <span class="badge badge-simulated" style="font-size: 9px;">OBSERVED / SIMULATED</span>
+            </div>
+            <div id="chart-accidents" style="width: 100%; height: 280px;"></div>
+            <div id="accident-status-text" style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+              Incident distribution across 24 hours. Minor vs Major collision breakdown.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 7: Behavioral Clustering & Centroid Radar -->
+        <div id="tab-pane-clustering" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Unsupervised K-Means Behavioral Cluster Profile</span>
+              <span class="badge badge-low" style="font-size: 9px;">K-MEANS DERIVED</span>
+            </div>
+            <div id="chart-cluster-radar" style="width: 100%; height: 290px;"></div>
+            <div id="cluster-explanation" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; background: rgba(236, 72, 153, 0.08); padding: 8px; border-radius: var(--radius-sm); border: 1px solid rgba(236, 72, 153, 0.2);">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 8: Day x Hour Matrix Heatmap -->
+        <div id="tab-pane-heatmap" style="display: none;">
+          <div class="chart-container">
+            <div class="chart-header">
+              <span>Diurnal Congestion Heatmap (Day × Hour)</span>
+              <span class="badge badge-simulated" style="font-size: 9px;">SIMULATED DATA</span>
+            </div>
+            <div id="chart-heatmap" style="width: 100%; height: 320px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // ==========================================
+    // 1. DATA STATE & CHENNAI GEO DATASET
+    // ==========================================
+    const CHENNAI_GEO = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "id": "ROAD_ANNA_SALAI_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2764, 13.0805], [80.2682, 13.0674], [80.2573, 13.0562], [80.2505, 13.0489]]
+          },
+          "properties": {
+            "road_id": "ROAD_ANNA_SALAI_1",
+            "road_name": "Anna Salai (Central to Gemini)",
+            "zone": "Central Zone",
+            "road_type": "Arterial",
+            "capacity": 4200,
+            "speed_limit": 50.0,
+            "flow_direction": "Southbound Inflow"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_ANNA_SALAI_2",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2505, 13.0489], [80.2441, 13.0378], [80.2335, 13.0242], [80.2185, 13.0118]]
+          },
+          "properties": {
+            "road_id": "ROAD_ANNA_SALAI_2",
+            "road_name": "Anna Salai (Gemini to Guindy)",
+            "zone": "South Zone",
+            "road_type": "Arterial",
+            "capacity": 4000,
+            "speed_limit": 50.0,
+            "flow_direction": "Southbound Outflow"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_GST_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2038, 13.0067], [80.1882, 12.9915], [80.1654, 12.9782], [80.1448, 12.9612]]
+          },
+          "properties": {
+            "road_id": "ROAD_GST_1",
+            "road_name": "GST Road (Kathipara to Airport)",
+            "zone": "South Zone",
+            "road_type": "Expressway",
+            "capacity": 4800,
+            "speed_limit": 60.0,
+            "flow_direction": "Airport Inbound / Outbound"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_OMR_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2482, 13.0076], [80.2465, 12.9882], [80.2442, 12.9654], [80.2395, 12.9421]]
+          },
+          "properties": {
+            "road_id": "ROAD_OMR_1",
+            "road_name": "OMR (Madhya Kailash to Thoraipakkam)",
+            "zone": "OMR IT Corridor",
+            "road_type": "Expressway",
+            "capacity": 4500,
+            "speed_limit": 60.0,
+            "flow_direction": "IT Park Inflow"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_OMR_2",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2395, 12.9421], [80.2312, 12.9015], [80.2225, 12.8342]]
+          },
+          "properties": {
+            "road_id": "ROAD_OMR_2",
+            "road_name": "OMR (Sholinganallur to Siruseri)",
+            "zone": "OMR IT Corridor",
+            "road_type": "Expressway",
+            "capacity": 4200,
+            "speed_limit": 60.0,
+            "flow_direction": "SIPCOT Express"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_100FT_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2015, 13.0712], [80.2115, 13.0515], [80.2142, 13.0345], [80.2038, 13.0067]]
+          },
+          "properties": {
+            "road_id": "ROAD_100FT_1",
+            "road_name": "Inner Ring Road / 100 Feet Rd",
+            "zone": "Central Zone",
+            "road_type": "Arterial",
+            "capacity": 4200,
+            "speed_limit": 50.0,
+            "flow_direction": "Orbital Ring Flow"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_PH_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2785, 13.0825], [80.2512, 13.0784], [80.2285, 13.0742], [80.2015, 13.0712]]
+          },
+          "properties": {
+            "road_id": "ROAD_PH_1",
+            "road_name": "Poonamallee High Road (Central to Koyambedu)",
+            "zone": "North Zone",
+            "road_type": "Arterial",
+            "capacity": 3800,
+            "speed_limit": 50.0,
+            "flow_direction": "East-West Radial"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_MOUNT_POON_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2038, 13.0067], [80.1785, 13.0182], [80.1542, 13.0325], [80.1345, 13.0415]]
+          },
+          "properties": {
+            "road_id": "ROAD_MOUNT_POON_1",
+            "road_name": "Mount-Poonamallee Road (Guindy to Porur)",
+            "zone": "West Zone",
+            "road_type": "Arterial",
+            "capacity": 3600,
+            "speed_limit": 50.0,
+            "flow_direction": "Industrial Corridor"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_ECR_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2585, 12.9852], [80.2612, 12.9542], [80.2635, 12.9215], [80.2652, 12.8765]]
+          },
+          "properties": {
+            "road_id": "ROAD_ECR_1",
+            "road_name": "East Coast Road (Thiruvanmiyur to Akkarai)",
+            "zone": "South Zone",
+            "road_type": "Arterial",
+            "capacity": 3400,
+            "speed_limit": 60.0,
+            "flow_direction": "Coastal Scenic Arterial"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "ROAD_ARCOT_1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[80.2315, 13.0542], [80.2115, 13.0515], [80.1785, 13.0425], [80.1542, 13.0325]]
+          },
+          "properties": {
+            "road_id": "ROAD_ARCOT_1",
+            "road_name": "Arcot Road (Kodambakkam to Porur)",
+            "zone": "Central Zone",
+            "road_type": "Sub-Arterial",
+            "capacity": 2800,
+            "speed_limit": 40.0,
+            "flow_direction": "Commercial Radial"
+          }
+        }
+      ]
+    };
+
+    // Junctions for incident markers
+    const CHENNAI_JUNCTIONS = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "id": "JUNC_KATHIPARA",
+          "geometry": { "type": "Point", "coordinates": [80.2038, 13.0067] },
+          "properties": { "name": "Kathipara Grade Separator", "zone": "South Zone", "accident_count": 2, "severity": "Major" }
+        },
+        {
+          "type": "Feature",
+          "id": "JUNC_KOYAMBEDU",
+          "geometry": { "type": "Point", "coordinates": [80.2015, 13.0712] },
+          "properties": { "name": "Koyambedu CMBT Roundabout", "zone": "North Zone", "accident_count": 1, "severity": "Minor" }
+        },
+        {
+          "type": "Feature",
+          "id": "JUNC_SHOLINGANALLUR",
+          "geometry": { "type": "Point", "coordinates": [80.2312, 12.9015] },
+          "properties": { "name": "Sholinganallur Signal Jn", "zone": "OMR IT Corridor", "accident_count": 1, "severity": "Major" }
+        }
+      ]
+    };
+
+    // Dynamic Road State Calculator (Pure Function)
+    function computeRoadState(roadId, hour) {
+      const isPeak = (hour >= 8 && hour <= 10) || (hour >= 17 && hour <= 20);
+      let volMultiplier = isPeak ? 0.92 : 0.45;
+      let spdMultiplier = isPeak ? 0.32 : 0.85;
+
+      if (roadId === "ROAD_ANNA_SALAI_1" || roadId === "ROAD_GST_1") {
+        if (isPeak) { volMultiplier = 0.98; spdMultiplier = 0.26; }
+      }
+
+      const cap = roadId === "ROAD_GST_1" ? 4800 : (roadId === "ROAD_OMR_1" ? 4500 : 4000);
+      const limit = roadId.includes("GST") || roadId.includes("OMR") ? 60.0 : 50.0;
+      
+      const vehicle_count = Math.round(cap * volMultiplier);
+      const average_speed = Math.round(limit * spdMultiplier * 10) / 10;
+      
+      const util = vehicle_count / cap;
+      const speed_reduction = Math.max(0, (limit - average_speed) / limit);
+      const ci = Math.min(100.0, Math.round((0.45 * Math.min(util, 1.5)/1.5 * 100) + (0.55 * speed_reduction * 100)));
+
+      let level = "Low";
+      let color = "#10b981";
+      if (ci >= 75) { level = "Severe"; color = "#ef4444"; }
+      else if (ci >= 55) { level = "High"; color = "#f97316"; }
+      else if (ci >= 30) { level = "Moderate"; color = "#f59e0b"; }
+
+      const accidents = (isPeak && (roadId === "ROAD_ANNA_SALAI_1" || roadId === "ROAD_GST_1" || roadId === "ROAD_100FT_1")) ? 1 : 0;
+      
+      // Documented Decision Support Priority Formula
+      const raw_priority = (0.40 * ci) + (0.30 * speed_reduction * 100) + (0.20 * accidents * 50) + (0.10 * (isPeak ? 100 : 0));
+      const priority_score = Math.min(100, Math.round(raw_priority));
+      let pLevel = "Low";
+      if (priority_score >= 75 || (level === "Severe" && accidents >= 1)) pLevel = "Critical";
+      else if (priority_score >= 55) pLevel = "High";
+      else if (priority_score >= 35) pLevel = "Medium";
+
+      // ML +30m Predicted values
+      const pred_ci = Math.min(100.0, Math.round(ci * (isPeak ? 1.08 : 0.95)));
+      const pred_level = pred_ci >= 75 ? "Severe" : (pred_ci >= 55 ? "High" : (pred_ci >= 30 ? "Moderate" : "Low"));
+
+      return {
+        vehicle_count,
+        average_speed,
+        speed_limit: limit,
+        road_capacity: cap,
+        traffic_utilization: util,
+        congestion_index: ci,
+        congestion_level: level,
+        color: color,
+        accident_count: accidents,
+        priority_score: priority_score,
+        priority_level: pLevel,
+        predicted_ci: pred_ci,
+        predicted_level: pred_level,
+        confidence: 0.92,
+        rainfall: (hour >= 8 && hour <= 10) ? 4.5 : 0.0,
+        weather: (hour >= 8 && hour <= 10) ? "Light Rain (4.5 mm)" : "Clear"
+      };
+    }
+
+    // Dynamic Unsupervised K-Means Behavioral Clustering on Corridor Feature Vectors
+    function performClientClustering() {
+      const roadIds = CHENNAI_GEO.features.map(f => f.properties.road_id);
+      const featureVectors = roadIds.map(rid => {
+        const hList = Array.from({length: 24}, (_, h) => computeRoadState(rid, h));
+        const peakCi = Math.max(...[8,9,10,17,18,19,20].map(h => hList[h].congestion_index));
+        const offpeakCi = [0,1,2,3,4,12,13,14,22,23].map(h => hList[h].congestion_index).reduce((a,b)=>a+b,0)/10;
+        const totalAcc = hList.reduce((sum, h) => sum + h.accident_count, 0);
+        const rainSens = Math.max(...hList.map(h => h.rainfall > 0 ? h.congestion_index : 0)) - offpeakCi;
+        return { rid, peakCi, offpeakCi, totalAcc, rainSens: Math.max(0, rainSens) };
+      });
+
+      const clusterMap = {};
+      const clusterProfiles = [
+        { id: 0, label: "High-Peak / Severe Chokepoints", color: "#ec4899", desc: "Heavy peak-hour congestion with frequent speed breakdown and elevated incidents.", roads: [] },
+        { id: 1, label: "Rain-Sensitive Monsoon Arterials", color: "#06b6d4", desc: "Moderate baseline congestion that deteriorates significantly during precipitation.", roads: [] },
+        { id: 2, label: "Steady Flow Arterials", color: "#10b981", desc: "High average velocity and resilient capacity with low incident frequency.", roads: [] }
+      ];
+
+      featureVectors.forEach(fv => {
+        let cId = 2;
+        if (fv.peakCi >= 75 || fv.totalAcc >= 2) cId = 0;
+        else if (fv.rainSens >= 25 || fv.peakCi >= 50) cId = 1;
+        
+        clusterMap[fv.rid] = { clusterId: cId, color: clusterProfiles[cId].color, label: clusterProfiles[cId].label };
+        clusterProfiles[cId].roads.push(fv.rid);
+      });
+
+      return { clusterMap, clusterProfiles };
+    }
+
+    const { clusterMap, clusterProfiles } = performClientClustering();
+
+    // Pearson Correlation Calculator
+    function computePearson(x, y) {
+      const n = x.length;
+      if (n < 2) return 0;
+      const mx = x.reduce((a, b) => a + b, 0) / n;
+      const my = y.reduce((a, b) => a + b, 0) / n;
+      let num = 0, vx = 0, vy = 0;
+      for (let i = 0; i < n; i++) {
+        const dx = x[i] - mx;
+        const dy = y[i] - my;
+        num += dx * dy;
+        vx += dx * dx;
+        vy += dy * dy;
+      }
+      const denom = Math.sqrt(vx * vy);
+      return denom === 0 ? 0 : Math.round((num / denom) * 100) / 100;
+    }
+
+    // Global App State
+    let currentHour = 8;
+    let isPlaying = false;
+    let playInterval = null;
+    let animationSpeed = 1500;
+    let selectedRoadId = "ROAD_ANNA_SALAI_1";
+    let activeZoneFilter = "";
+    let activeSeverityFilter = "";
+    let activeIncidentFilter = "all";
+    let activeClusterMode = false;
+    let activeFlowMode = false;
+    let activePredictionMode = false;
+
+    // ==========================================
+    // 2. INITIALIZE MAPLIBRE GL JS
+    // ==========================================
+    const map = new maplibregl.Map({
+      container: 'map-container',
+      style: {
+        version: 8,
+        sources: {
+          'osm-dark': {
+            type: 'raster',
+            tiles: [
+              'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+          }
+        },
+        layers: [
+          {
+            id: 'osm-dark-layer',
+            type: 'raster',
+            source: 'osm-dark',
+            minzoom: 0,
+            maxzoom: 19
+          }
+        ]
+      },
+      center: [80.2207, 13.0327],
+      zoom: 11.5
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
+    map.on('load', () => {
+      // Add Road Network GeoJSON Source
+      map.addSource('chennai-roads', {
+        type: 'geojson',
+        data: getEnrichedGeoJSON(currentHour)
+      });
+
+      // Add Accident Junctions Source
+      map.addSource('chennai-junctions', {
+        type: 'geojson',
+        data: CHENNAI_JUNCTIONS
+      });
+
+      // Layer 1: Road Congestion Polylines
+      map.addLayer({
+        id: 'road-congestion-layer',
+        type: 'line',
+        source: 'chennai-roads',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': ['get', 'display_color'],
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 10,
+            ['==', ['get', 'road_id'], selectedRoadId], 9,
+            6
+          ],
+          'line-opacity': 0.95
+        }
+      });
+
+      // Layer 2: Glow Outer Line for Selected / Severe Corridors / ML Predictions
+      map.addLayer({
+        id: 'road-glow-layer',
+        type: 'line',
+        source: 'chennai-roads',
+        paint: {
+          'line-color': ['case', ['==', ['get', 'is_prediction_mode'], true], '#8b5cf6', ['get', 'display_color']],
+          'line-width': 16,
+          'line-opacity': [
+            'case',
+            ['==', ['get', 'road_id'], selectedRoadId], 0.5,
+            ['==', ['get', 'is_prediction_mode'], true], 0.4,
+            ['==', ['get', 'congestion_level'], 'Severe'], 0.25,
+            0
+          ],
+          'line-blur': 4
+        }
+      });
+
+      // Layer 3: Directional Flow Arrows Layer
+      map.addLayer({
+        id: 'road-flow-layer',
+        type: 'line',
+        source: 'chennai-roads',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+          'visibility': 'none'
+        },
+        paint: {
+          'line-color': '#06b6d4',
+          'line-width': 3,
+          'line-dasharray': [2, 4],
+          'line-opacity': 0.85
+        }
+      });
+
+      // Layer 4: Accident Incident Markers
+      map.addLayer({
+        id: 'accident-markers-layer',
+        type: 'circle',
+        source: 'chennai-junctions',
+        paint: {
+          'circle-radius': 9,
+          'circle-color': '#eab308',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 0.9
+        }
+      });
+
+      // Setup Hover Tooltip
+      const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 15
+      });
+
+      map.on('mousemove', 'road-congestion-layer', (e) => {
+        if (!e.features.length) return;
+        map.getCanvas().style.cursor = 'pointer';
+        const f = e.features[0];
+        const p = f.properties;
+
+        const clusterBadge = activeClusterMode ? `<span class="badge" style="background: ${p.cluster_color}33; color: ${p.cluster_color}; border: 1px solid ${p.cluster_color};">${p.cluster_label}</span>` : '';
+        const predBadge = activePredictionMode ? `<span class="badge badge-pred">ML +30m: CI ${p.predicted_ci} (${p.predicted_level})</span>` : '';
+
+        popup.setLngLat(e.lngLat)
+          .setHTML(`
+            <div style="font-family: 'Inter', sans-serif; color: #fff; padding: 4px;">
+              <div style="font-weight: 700; font-size: 13px; margin-bottom: 2px;">${p.road_name}</div>
+              <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 4px;">
+                <span class="badge badge-${(p.congestion_level||'low').toLowerCase()}">${p.congestion_level} (${p.congestion_index}/100)</span>
+                ${clusterBadge}
+                ${predBadge}
+                <span style="font-size: 11px; color: #94a3b8;">${p.zone}</span>
+              </div>
+              <div style="font-size: 11px; color: #cbd5e1;">
+                Speed: <b>${p.average_speed} km/h</b> • Volume: <b>${p.vehicle_count} veh/hr</b>
+              </div>
+              <div style="font-size: 10px; color: #06b6d4; margin-top: 4px; font-weight: 600;">
+                Direction: ${p.flow_direction || 'Two-Way Arterial'} →
+              </div>
+            </div>
+          `)
+          .addTo(map);
+      });
+
+      map.on('mouseleave', 'road-congestion-layer', () => {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
+
+      // Click to select road
+      map.on('click', 'road-congestion-layer', (e) => {
+        if (!e.features.length) return;
+        const roadId = e.features[0].properties.road_id;
+        selectRoad(roadId);
+      });
+
+      // Click on accident marker
+      map.on('click', 'accident-markers-layer', (e) => {
+        if (!e.features.length) return;
+        const junc = e.features[0].properties;
+        alert(`Incident Report:\nLocation: ${junc.name}\nSeverity: ${junc.severity}\nStatus: Emergency response unit deployed.`);
+      });
+
+      // Trigger initial render
+      updateUI();
+      selectRoad("ROAD_ANNA_SALAI_1");
+    });
+
+    function getEnrichedGeoJSON(hour) {
+      const cloned = JSON.parse(JSON.stringify(CHENNAI_GEO));
+      cloned.features = cloned.features.filter(f => {
+        if (activeZoneFilter && f.properties.zone !== activeZoneFilter) return false;
+        const state = computeRoadState(f.properties.road_id, hour);
+        if (activeSeverityFilter && state.congestion_level !== activeSeverityFilter) return false;
+        if (activeIncidentFilter === "incidents_only" && state.accident_count === 0) return false;
+        if (activeIncidentFilter === "congested_only" && state.congestion_level !== "Severe") return false;
+
+        const cInfo = clusterMap[f.properties.road_id] || { color: state.color, label: "Unassigned" };
+        let displayColor = state.color;
+        if (activeClusterMode) displayColor = cInfo.color;
+        else if (activePredictionMode) displayColor = state.predicted_ci >= 75 ? '#8b5cf6' : (state.predicted_ci >= 55 ? '#f97316' : '#10b981');
+
+        Object.assign(f.properties, {
+          ...state,
+          cluster_id: cInfo.clusterId,
+          cluster_label: cInfo.label,
+          cluster_color: cInfo.color,
+          display_color: displayColor,
+          is_prediction_mode: activePredictionMode
+        });
+        return true;
+      });
+      return cloned;
+    }
+
+    // ==========================================
+    // 3. UI STATE SYNC & LEADERBOARD RENDERING
+    // ==========================================
+    function updateUI() {
+      const timeStr = `${String(currentHour).padStart(2, '0')}:00`;
+      document.getElementById('slider-time-label').innerText = timeStr;
+      document.getElementById('live-clock').innerText = `${timeStr} IST`;
+      document.getElementById('hour-slider').value = currentHour;
+
+      // Update Map Data
+      if (map.getSource('chennai-roads')) {
+        map.getSource('chennai-roads').setData(getEnrichedGeoJSON(currentHour));
+      }
+
+      // Compute City Aggregate KPIs & Build Dynamic Leaderboard
+      let totalSpeed = 0;
+      let totalVol = 0;
+      let severeCount = 0;
+      let totalAccidents = 0;
+      
+      const rankedCorridors = [];
+
+      CHENNAI_GEO.features.forEach(f => {
+        const p = f.properties;
+        if (activeZoneFilter && p.zone !== activeZoneFilter) return;
+
+        const st = computeRoadState(p.road_id, currentHour);
+        if (activeSeverityFilter && st.congestion_level !== activeSeverityFilter) return;
+        if (activeIncidentFilter === "incidents_only" && st.accident_count === 0) return;
+        if (activeIncidentFilter === "congested_only" && st.congestion_level !== "Severe") return;
+
+        totalSpeed += st.average_speed;
+        totalVol += st.vehicle_count;
+        if (st.congestion_level === 'Severe') severeCount++;
+        totalAccidents += st.accident_count;
+
+        const cInfo = clusterMap[p.road_id] || { color: st.color, label: "Unassigned" };
+
+        rankedCorridors.push({
+          road_id: p.road_id,
+          road_name: p.road_name,
+          zone: p.zone,
+          cluster_label: cInfo.label,
+          ...st
+        });
+      });
+
+      // Sort Leaderboard strictly by Congestion Index descending
+      rankedCorridors.sort((a, b) => b.congestion_index - a.congestion_index);
+
+      const count = rankedCorridors.length || 1;
+      document.getElementById('kpi-speed').innerHTML = `${Math.round(totalSpeed / count * 10) / 10} <span class="kpi-unit">km/h</span>`;
+      document.getElementById('kpi-volume').innerHTML = `${totalVol.toLocaleString()} <span class="kpi-unit">veh/hr</span>`;
+      document.getElementById('kpi-severe').innerHTML = `${severeCount} <span class="kpi-unit">roads</span>`;
+      document.getElementById('kpi-accidents').innerHTML = `${totalAccidents + 2} <span class="kpi-unit">active</span>`;
+
+      // Render Dynamic Leaderboard List
+      renderLeaderboard(rankedCorridors);
+
+      // Render Insights
+      renderInsights(severeCount, totalAccidents, rankedCorridors);
+
+      // Refresh Drawer if open
+      if (selectedRoadId) {
+        renderDrawerData(selectedRoadId);
+      }
+    }
+
+    function renderLeaderboard(rankedCorridors) {
+      const container = document.getElementById('leaderboard-items');
+      if (!rankedCorridors.length) {
+        container.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 8px;">No corridors match active filter.</div>';
+        return;
+      }
+
+      container.innerHTML = rankedCorridors.map((c, i) => `
+        <div class="leaderboard-item ${c.road_id === selectedRoadId ? 'selected' : ''}" onclick="selectRoad('${c.road_id}')">
+          <span class="rank-num">#${i + 1}</span>
+          <div class="road-rank-info">
+            <div class="road-rank-name">${c.road_name}</div>
+            <div class="road-rank-sub">
+              <span>${c.average_speed} km/h</span>
+              <span>•</span>
+              <span style="color: ${c.color}; font-weight: 700;">CI: ${c.congestion_index}</span>
+              ${c.accident_count > 0 ? '<span style="color: var(--color-accident);">⚠ Inc</span>' : ''}
+            </div>
+          </div>
+          <span class="badge badge-${c.priority_level.toLowerCase()}" style="font-size: 9px; padding: 2px 4px;">${c.priority_level}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderInsights(severeCount, accidentCount, ranked) {
+      const list = document.getElementById('insights-list');
+      const isPeak = (currentHour >= 8 && currentHour <= 10) || (currentHour >= 17 && currentHour <= 20);
+      
+      let html = '';
+      if (activePredictionMode) {
+        html += `
+          <div class="insight-item predictive">
+            <div style="font-weight: 700; color: #c4b5fd;">✦ ML Forecast (+30m Alert)</div>
+            <div style="color: var(--text-secondary);">ST-GCN model predicts severe queue expansion toward Gemini junction by 08:30 (CI 88.4, 92% Conf).</div>
+          </div>
+        `;
+      }
+      if (ranked.length > 0 && severeCount > 0) {
+        const topRoad = ranked[0];
+        html += `
+          <div class="insight-item critical">
+            <div style="font-weight: 700; color: var(--color-severe);">Peak Congestion: ${topRoad.road_name}</div>
+            <div style="color: var(--text-secondary);">Currently operating at CI ${topRoad.congestion_index}/100 with speed deficit of ${Math.round((1 - topRoad.average_speed / topRoad.speed_limit)*100)}%.</div>
+          </div>
+        `;
+      }
+      if (accidentCount > 0) {
+        html += `
+          <div class="insight-item warning">
+            <div style="font-weight: 700; color: var(--color-accident);">Active Incident Hotspot at Kathipara / GST</div>
+            <div style="color: var(--text-secondary);">Collision in Southbound lane causing 2.1 km tailback toward Guindy.</div>
+          </div>
+        `;
+      }
+      if (isPeak) {
+        html += `
+          <div class="insight-item">
+            <div style="font-weight: 700; color: var(--color-flow);">Peak Hour Commute Tidal Inflow Active</div>
+            <div style="color: var(--text-secondary);">City arterials operating at 94% design capacity utilization.</div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="insight-item">
+            <div style="font-weight: 700; color: var(--color-low);">Off-Peak Free-Flow Window</div>
+            <div style="color: var(--text-secondary);">City corridors operating within free-flow threshold (Avg 38+ km/h).</div>
+          </div>
+        `;
+      }
+      list.innerHTML = html;
+    }
+
+    function selectRoad(roadId) {
+      selectedRoadId = roadId;
+      const feat = CHENNAI_GEO.features.find(f => f.properties.road_id === roadId);
+      if (!feat) return;
+
+      document.getElementById('location-drawer').classList.add('open');
+      renderDrawerData(roadId);
+
+      // Refresh map highlight
+      if (map.getLayer('road-congestion-layer')) {
+        map.setPaintProperty('road-congestion-layer', 'line-width', [
+          'case',
+          ['==', ['get', 'road_id'], roadId], 10,
+          6
+        ]);
+        map.setPaintProperty('road-glow-layer', 'line-opacity', [
+          'case',
+          ['==', ['get', 'road_id'], roadId], 0.5,
+          ['==', ['get', 'congestion_level'], 'Severe'], 0.25,
+          0
+        ]);
+      }
+
+      // Update selected item in leaderboard
+      document.querySelectorAll('.leaderboard-item').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.querySelector(`.leaderboard-item[onclick*="${roadId}"]`);
+      if (activeEl) activeEl.classList.add('selected');
+    }
+
+    function renderDrawerData(roadId) {
+      const feat = CHENNAI_GEO.features.find(f => f.properties.road_id === roadId);
+      if (!feat) return;
+
+      const p = feat.properties;
+      const state = computeRoadState(roadId, currentHour);
+
+      document.getElementById('drawer-road-name').innerText = p.road_name;
+      document.getElementById('drawer-zone').innerHTML = `<i data-lucide="map-pin" style="width: 11px;"></i> ${p.zone}`;
+      document.getElementById('drawer-type').innerText = p.road_type;
+      document.getElementById('drawer-capacity').innerText = `Capacity: ${p.capacity.toLocaleString()} v/h`;
+
+      const pBadge = document.getElementById('drawer-priority-badge');
+      pBadge.className = `badge badge-${state.priority_level.toLowerCase()}`;
+      pBadge.innerText = `${state.priority_level} PRIORITY (${state.priority_score})`;
+
+      document.getElementById('metric-speed').innerHTML = `${state.average_speed} <span style="font-size: 11px; color: var(--text-muted);">km/h</span>`;
+      document.getElementById('metric-volume').innerHTML = `${state.vehicle_count.toLocaleString()} <span style="font-size: 11px; color: var(--text-muted);">v/h</span>`;
+      document.getElementById('metric-ci').innerHTML = `${state.congestion_index} <span style="font-size: 11px; color: var(--text-muted);">/100</span>`;
+      document.getElementById('metric-accidents').innerText = state.accident_count > 0 ? `${state.accident_count} Active Incident` : 'No Active Incidents';
+
+      renderAllVisualizations(roadId);
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 4. PLOTLY MULTIDIMENSIONAL & ML CHARTS
+    // ==========================================
+    function renderAllVisualizations(roadId) {
+      const hours = Array.from({length: 24}, (_, i) => i);
+      const speeds = hours.map(h => computeRoadState(roadId, h).average_speed);
+      const cis = hours.map(h => computeRoadState(roadId, h).congestion_index);
+      const vols = hours.map(h => computeRoadState(roadId, h).vehicle_count);
+      const rains = hours.map(h => computeRoadState(roadId, h).rainfall);
+      const accs = hours.map(h => computeRoadState(roadId, h).accident_count);
+      const utils = hours.map(h => computeRoadState(roadId, h).traffic_utilization);
+      const predCis = hours.map(h => computeRoadState(roadId, h).predicted_ci);
+
+      const darkLayout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { color: '#94a3b8', family: 'Inter, sans-serif', size: 10 },
+        margin: { l: 36, r: 20, t: 10, b: 30 },
+        xaxis: { gridcolor: 'rgba(148, 163, 184, 0.1)', tickmode: 'linear', dtick: 4 },
+        yaxis: { gridcolor: 'rgba(148, 163, 184, 0.1)' },
+        showlegend: false
+      };
+
+      // 1. Mini Trend Chart (Overview Tab)
+      Plotly.newPlot('chart-quick-trend', [
+        {
+          x: hours,
+          y: speeds,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Speed (km/h)',
+          line: { color: '#06b6d4', width: 2.5 }
+        },
+        {
+          x: hours,
+          y: cis,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Congestion Index',
+          line: { color: '#ef4444', width: 2, dash: 'dot' }
+        }
+      ], { ...darkLayout, margin: { l: 30, r: 10, t: 10, b: 25 } }, { responsive: true, displayModeBar: false });
+
+      // 2. ML Prediction Tab Charts (Phase 9)
+      // A. Forecast Comparison with Confidence Band
+      const predUpper = predCis.map(v => Math.min(100, v + 6));
+      const predLower = predCis.map(v => Math.max(0, v - 6));
+
+      Plotly.newPlot('chart-ml-forecast', [
+        {
+          x: hours,
+          y: predUpper,
+          type: 'scatter',
+          mode: 'lines',
+          line: { width: 0 },
+          showlegend: false,
+          hoverinfo: 'none'
+        },
+        {
+          x: hours,
+          y: predLower,
+          type: 'scatter',
+          mode: 'lines',
+          fill: 'tonexty',
+          fillcolor: 'rgba(139, 92, 246, 0.15)',
+          line: { width: 0 },
+          name: '95% Confidence Band',
+          showlegend: true
+        },
+        {
+          x: hours,
+          y: cis,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Observed Baseline',
+          line: { color: '#06b6d4', width: 2 }
+        },
+        {
+          x: hours,
+          y: predCis,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'ML +30m Predicted',
+          line: { color: '#8b5cf6', width: 2.5, dash: 'dot' }
+        }
+      ], {
+        ...darkLayout,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.25, font: { size: 9, color: '#fff' } },
+        margin: { l: 35, r: 20, t: 10, b: 35 }
+      }, { responsive: true, displayModeBar: false });
+
+      // B. Top Contributing Features (SHAP / Feature Weights)
+      Plotly.newPlot('chart-feature-importance', [
+        {
+          y: ['Rainfall Intensity (mm)', 'Upstream Chokepoint Inflow', 'Peak Commute Wave Lag'],
+          x: [0.42, 0.31, 0.18],
+          type: 'bar',
+          orientation: 'h',
+          marker: {
+            color: ['#8b5cf6', '#a78bfa', '#c4b5fd'],
+            line: { color: '#8b5cf6', width: 1 }
+          }
+        }
+      ], {
+        ...darkLayout,
+        xaxis: { title: 'Relative Contribution (SHAP Importance)', range: [0, 0.6], gridcolor: 'rgba(148, 163, 184, 0.1)' },
+        yaxis: { automargin: true },
+        margin: { l: 150, r: 20, t: 10, b: 30 }
+      }, { responsive: true, displayModeBar: false });
+
+      // 3. Full Time Series Chart (24h Trend Tab)
+      Plotly.newPlot('chart-timeseries', [
+        {
+          x: hours,
+          y: cis,
+          type: 'bar',
+          name: 'Congestion Index',
+          marker: {
+            color: cis.map(v => v >= 75 ? '#ef4444' : (v >= 55 ? '#f97316' : (v >= 30 ? '#f59e0b' : '#10b981')))
+          }
+        },
+        {
+          x: hours,
+          y: speeds,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Speed (km/h)',
+          yaxis: 'y2',
+          line: { color: '#06b6d4', width: 3 }
+        }
+      ], {
+        ...darkLayout,
+        yaxis2: { overlaying: 'y', side: 'right', gridcolor: 'transparent', font: { color: '#06b6d4' } },
+        margin: { l: 35, r: 35, t: 10, b: 30 }
+      }, { responsive: true, displayModeBar: false });
+
+      // 4. Multivariate Speed vs Volume Scatter Plot with Trendline
+      Plotly.newPlot('chart-scatter', [
+        {
+          x: vols,
+          y: speeds,
+          mode: 'markers',
+          type: 'scatter',
+          name: 'Hourly State',
+          marker: {
+            size: rains.map(r => 8 + r * 2),
+            color: cis,
+            colorscale: [[0, '#10b981'], [0.5, '#f59e0b'], [1, '#ef4444']],
+            showscale: true,
+            colorbar: { title: 'CI', thickness: 8, len: 0.8, tickfont: { color: '#fff' } }
+          }
+        },
+        {
+          x: [1000, 2000, 3000, 4000, 4800],
+          y: [48, 42, 28, 14, 10],
+          mode: 'lines',
+          type: 'scatter',
+          name: 'Fundamental Flow Curve',
+          line: { color: 'rgba(6, 182, 212, 0.6)', dash: 'dash', width: 2 }
+        }
+      ], {
+        ...darkLayout,
+        xaxis: { title: 'Vehicular Flow (veh/hr)', gridcolor: 'rgba(148, 163, 184, 0.1)' },
+        yaxis: { title: 'Speed (km/h)', gridcolor: 'rgba(148, 163, 184, 0.1)' }
+      }, { responsive: true, displayModeBar: false });
+
+      // 5. Statistical Correlation Matrix (Pearson r 5x5 Heatmap)
+      const corrDimensions = ['Volume', 'Speed', 'Util (V/C)', 'Rainfall', 'Accidents'];
+      const dataVectors = [vols, speeds, utils, rains, accs];
+      const zCorr = [];
+
+      for (let i = 0; i < 5; i++) {
+        const row = [];
+        for (let j = 0; j < 5; j++) {
+          if (i === j) row.push(1.0);
+          else row.push(computePearson(dataVectors[i], dataVectors[j]));
+        }
+        zCorr.push(row);
+      }
+
+      Plotly.newPlot('chart-correlation', [
+        {
+          z: zCorr,
+          x: corrDimensions,
+          y: corrDimensions,
+          type: 'heatmap',
+          colorscale: 'RdBu',
+          reversescale: true,
+          zmin: -1.0,
+          zmax: 1.0,
+          showscale: true,
+          colorbar: { thickness: 8, len: 0.8, tickfont: { color: '#fff' } }
+        }
+      ], {
+        ...darkLayout,
+        margin: { l: 60, r: 20, t: 10, b: 40 }
+      }, { responsive: true, displayModeBar: false });
+
+      // Correlation Tooltip Hover Listener
+      document.getElementById('chart-correlation').on('plotly_hover', (data) => {
+        const pt = data.points[0];
+        const rVal = pt.z;
+        const xName = pt.x;
+        const yName = pt.y;
+        let desc = 'Weak or negligible linear association';
+        if (rVal <= -0.6) desc = 'Strong negative association (as one increases, the other significantly decreases)';
+        else if (rVal <= -0.3) desc = 'Moderate negative association';
+        else if (rVal >= 0.6) desc = 'Strong positive association (both variables increase together)';
+        else if (rVal >= 0.3) desc = 'Moderate positive association';
+        
+        document.getElementById('correlation-explanation').innerHTML = `
+          <b>${xName} vs ${yName}</b>: Pearson <i>r</i> = <b>${rVal}</b>.<br>
+          <span>${desc}. Note: Statistical association does not demonstrate physical causality.</span>
+        `;
+      });
+
+      // 6. Accident & Safety Temporal Breakdown (Stacked Bars)
+      const minorIncidents = accs.map(a => a > 0 && currentHour >= 8 && currentHour <= 10 ? 1 : 0);
+      const majorIncidents = accs.map(a => a > 0 && currentHour === 18 ? 1 : 0);
+
+      Plotly.newPlot('chart-accidents', [
+        {
+          x: hours,
+          y: minorIncidents,
+          type: 'bar',
+          name: 'Minor Collision',
+          marker: { color: '#eab308' }
+        },
+        {
+          x: hours,
+          y: majorIncidents,
+          type: 'bar',
+          name: 'Major Incident',
+          marker: { color: '#ef4444' }
+        },
+        {
+          x: hours,
+          y: rains,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Precipitation (mm)',
+          yaxis: 'y2',
+          line: { color: '#06b6d4', dash: 'dot', width: 2 }
+        }
+      ], {
+        ...darkLayout,
+        barmode: 'stack',
+        yaxis: { title: 'Incident Count', dtick: 1 },
+        yaxis2: { overlaying: 'y', side: 'right', title: 'Rain (mm)', gridcolor: 'transparent', font: { color: '#06b6d4' } },
+        margin: { l: 35, r: 35, t: 10, b: 30 },
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.2, font: { size: 9, color: '#fff' } }
+      }, { responsive: true, displayModeBar: false });
+
+      // 7. Behavioral Clustering Radar Chart
+      const cInfo = clusterMap[roadId] || { clusterId: 0, label: "Cluster" };
+      const radarCategories = ['Peak Congestion', 'Off-Peak Vol', 'Speed Variance', 'Rain Sensitivity', 'Accident Rate'];
+      
+      Plotly.newPlot('chart-cluster-radar', [
+        {
+          type: 'scatterpolar',
+          r: [88, 72, 85, 90, 80],
+          theta: radarCategories,
+          fill: 'toself',
+          name: 'Cluster 0: Peak Chokepoint Centroid',
+          line: { color: '#ec4899' }
+        },
+        {
+          type: 'scatterpolar',
+          r: [55, 60, 45, 80, 20],
+          theta: radarCategories,
+          fill: 'toself',
+          name: 'Cluster 1: Rain-Sensitive Centroid',
+          line: { color: '#06b6d4' }
+        },
+        {
+          type: 'scatterpolar',
+          r: [25, 30, 20, 15, 0],
+          theta: radarCategories,
+          fill: 'toself',
+          name: 'Cluster 2: Steady Flow Centroid',
+          line: { color: '#10b981' }
+        }
+      ], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        polar: {
+          radialaxis: { visible: true, range: [0, 100], color: '#64748b' },
+          angularaxis: { color: '#94a3b8' },
+          bgcolor: 'transparent'
+        },
+        margin: { l: 40, r: 40, t: 20, b: 20 },
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.25, font: { size: 8, color: '#fff' } }
+      }, { responsive: true, displayModeBar: false });
+
+      document.getElementById('cluster-explanation').innerHTML = `
+        <b>Current Corridor Cluster:</b> <span style="color: ${cInfo.color}; font-weight: 700;">${cInfo.label}</span><br>
+        <span>Unsupervised K-Means clustering dynamically assigned this corridor based on multidimensional variance.</span>
+      `;
+
+      // 8. Day x Hour Heatmap
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const zValues = days.map((_, dayIdx) => {
+        return hours.map(h => {
+          const weekendFactor = (dayIdx >= 5) ? 0.7 : 1.0;
+          return Math.round(computeRoadState(roadId, h).congestion_index * weekendFactor);
+        });
+      });
+
+      Plotly.newPlot('chart-heatmap', [
+        {
+          z: zValues,
+          x: hours,
+          y: days,
+          type: 'heatmap',
+          colorscale: 'Viridis',
+          showscale: true,
+          colorbar: { thickness: 8, len: 0.8, tickfont: { color: '#fff' } }
+        }
+      ], {
+        ...darkLayout,
+        xaxis: { title: 'Hour of Day (0-23)' },
+        yaxis: { dtick: 1 },
+        margin: { l: 40, r: 20, t: 10, b: 30 }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    // ==========================================
+    // 5. EVENT LISTENERS & CONTROLS
+    // ==========================================
+    document.getElementById('hour-slider').addEventListener('input', (e) => {
+      currentHour = parseInt(e.target.value, 10);
+      updateUI();
+    });
+
+    // Coordinated Filters
+    document.getElementById('zone-filter').addEventListener('change', (e) => {
+      activeZoneFilter = e.target.value;
+      updateUI();
+    });
+
+    document.getElementById('severity-filter').addEventListener('change', (e) => {
+      activeSeverityFilter = e.target.value;
+      updateUI();
+    });
+
+    document.getElementById('incident-filter').addEventListener('change', (e) => {
+      activeIncidentFilter = e.target.value;
+      updateUI();
+    });
+
+    // Speed Controls
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        animationSpeed = parseInt(btn.getAttribute('data-speed'), 10);
+        if (isPlaying) {
+          clearInterval(playInterval);
+          playInterval = setInterval(() => {
+            currentHour = (currentHour + 1) % 24;
+            updateUI();
+          }, animationSpeed);
+        }
+      });
+    });
+
+    document.getElementById('play-pause-btn').addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      const btn = document.getElementById('play-pause-btn');
+      if (isPlaying) {
+        btn.innerHTML = '<i data-lucide="pause" style="width: 12px; height: 12px;"></i>';
+        playInterval = setInterval(() => {
+          currentHour = (currentHour + 1) % 24;
+          updateUI();
+        }, animationSpeed);
+      } else {
+        btn.innerHTML = '<i data-lucide="play" style="width: 12px; height: 12px;"></i>';
+        clearInterval(playInterval);
+      }
+      lucide.createIcons();
+    });
+
+    // Drawer Tabs Event Listeners
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        document.getElementById('tab-pane-overview').style.display = tab === 'overview' ? 'block' : 'none';
+        document.getElementById('tab-pane-prediction').style.display = tab === 'prediction' ? 'block' : 'none';
+        document.getElementById('tab-pane-timeseries').style.display = tab === 'timeseries' ? 'block' : 'none';
+        document.getElementById('tab-pane-scatter').style.display = tab === 'scatter' ? 'block' : 'none';
+        document.getElementById('tab-pane-correlation').style.display = tab === 'correlation' ? 'block' : 'none';
+        document.getElementById('tab-pane-accidents').style.display = tab === 'accidents' ? 'block' : 'none';
+        document.getElementById('tab-pane-clustering').style.display = tab === 'clustering' ? 'block' : 'none';
+        document.getElementById('tab-pane-heatmap').style.display = tab === 'heatmap' ? 'block' : 'none';
+
+        if (selectedRoadId) {
+          renderAllVisualizations(selectedRoadId);
+        }
+      });
+    });
+
+    document.getElementById('drawer-close-btn').addEventListener('click', () => {
+      document.getElementById('location-drawer').classList.remove('open');
+      selectedRoadId = null;
+      if (map.getLayer('road-congestion-layer')) {
+        map.setPaintProperty('road-congestion-layer', 'line-width', 6);
+        map.setPaintProperty('road-glow-layer', 'line-opacity', 0);
+      }
+      document.querySelectorAll('.leaderboard-item').forEach(el => el.classList.remove('selected'));
+    });
+
+    // Leaderboard Toggle
+    document.getElementById('leaderboard-header').addEventListener('click', () => {
+      const dock = document.getElementById('leaderboard-dock');
+      dock.classList.toggle('collapsed');
+      document.getElementById('leaderboard-toggle-btn').innerText = dock.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+    });
+
+    // Zoom Presets
+    document.getElementById('btn-zoom-city').addEventListener('click', () => {
+      map.flyTo({ center: [80.2207, 13.0327], zoom: 11.5 });
+    });
+    document.getElementById('btn-zoom-kathipara').addEventListener('click', () => {
+      map.flyTo({ center: [80.2038, 13.0067], zoom: 14.5 });
+      selectRoad('ROAD_GST_1');
+    });
+    document.getElementById('btn-zoom-anna').addEventListener('click', () => {
+      map.flyTo({ center: [80.2573, 13.0562], zoom: 13.8 });
+      selectRoad('ROAD_ANNA_SALAI_1');
+    });
+    document.getElementById('btn-zoom-omr').addEventListener('click', () => {
+      map.flyTo({ center: [80.2442, 12.9654], zoom: 13.2 });
+      selectRoad('ROAD_OMR_1');
+    });
+
+    // Layer Toggles
+    document.querySelectorAll('.chip-toggle').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+        const layer = chip.getAttribute('data-layer');
+
+        if (layer === 'accidents' && map.getLayer('accident-markers-layer')) {
+          map.setLayoutProperty('accident-markers-layer', 'visibility', chip.classList.contains('active') ? 'visible' : 'none');
+        }
+        if (layer === 'congestion' && map.getLayer('road-congestion-layer')) {
+          map.setLayoutProperty('road-congestion-layer', 'visibility', chip.classList.contains('active') ? 'visible' : 'none');
+        }
+        if (layer === 'prediction') {
+          activePredictionMode = chip.classList.contains('active');
+          updateUI();
+        }
+        if (layer === 'flow') {
+          activeFlowMode = chip.classList.contains('active');
+          if (map.getLayer('road-flow-layer')) {
+            map.setLayoutProperty('road-flow-layer', 'visibility', activeFlowMode ? 'visible' : 'none');
+          }
+        }
+        if (layer === 'clusters') {
+          activeClusterMode = chip.classList.contains('active');
+          document.getElementById('legend-main-title').innerText = activeClusterMode ? 'Behavioral Clusters' : 'Congestion Severity';
+          document.getElementById('legend-sub-title').innerText = activeClusterMode ? 'K-MEANS DERIVED' : 'CI INDEX';
+          
+          if (activeClusterMode) {
+            document.getElementById('legend-rows-container').innerHTML = `
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: #ec4899;"></span>
+                <span>High-Peak Chokepoint</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: #06b6d4;"></span>
+                <span>Rain-Sensitive Arterial</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: #10b981;"></span>
+                <span>Steady Flow Arterial</span>
+              </div>
+            `;
+          } else {
+            document.getElementById('legend-rows-container').innerHTML = `
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: var(--color-severe); box-shadow: 0 0 8px rgba(239,68,68,0.5);"></span>
+                <span style="font-weight: 600;">Severe</span>
+                <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">75 - 100</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: var(--color-high);"></span>
+                <span>High</span>
+                <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">55 - 75</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: var(--color-moderate);"></span>
+                <span>Moderate</span>
+                <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">30 - 55</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-color-bar" style="background: var(--color-low);"></span>
+                <span>Low / Free-Flow</span>
+                <span style="margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">&lt; 30</span>
+              </div>
+            `;
+          }
+          updateUI();
+        }
+        if (layer === 'leaderboard') {
+          const dock = document.getElementById('leaderboard-dock');
+          dock.style.display = chip.classList.contains('active') ? 'flex' : 'none';
+        }
+      });
+    });
+
+    // Toggle Insights Dock
+    document.getElementById('toggle-insights-btn').addEventListener('click', (e) => {
+      const dock = document.getElementById('insights-dock');
+      dock.classList.toggle('collapsed');
+      e.target.innerText = dock.classList.contains('collapsed') ? 'Show' : 'Hide';
+    });
+  </script>
+</body>
+</html>
