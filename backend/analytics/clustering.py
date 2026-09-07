@@ -125,7 +125,7 @@ def run_kmeans_clustering(
 
         # 2. Update step
         for c_idx in range(k):
-            assigned_pts = [norm_vectors[i] for i, a in enumerate(assignments) if a === c_idx] if hasattr(raw_vectors, 'count') else [norm_vectors[i] for i, a in enumerate(assignments) if a == c_idx]
+            assigned_pts = [norm_vectors[i] for i, a in enumerate(assignments) if a == c_idx] if hasattr(raw_vectors, 'count') else [norm_vectors[i] for i, a in enumerate(assignments) if a == c_idx]
             if assigned_pts:
                 centroids[c_idx] = [
                     sum(pt[d] for pt in assigned_pts) / len(assigned_pts)

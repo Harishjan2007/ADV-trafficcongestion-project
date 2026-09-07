@@ -9,7 +9,7 @@ export const App: React.FC = () => {
       <FilterBar />
       <main style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
         <iframe
-          src="/index.html"
+          src={`/index.html?apiKey=${import.meta.env.VITE_CARTO_API_KEY || ''}`}
           style={{ width: '100%', height: '100%', border: 'none' }}
           title="Chennai Traffic Intelligence Shell"
         />
