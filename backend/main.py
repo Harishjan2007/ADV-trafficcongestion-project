@@ -37,6 +37,32 @@ app.include_router(insights_router)
 app.include_router(ml_router)
 
 
+import os
+try:
+    from fastapi.responses import FileResponse, HTMLResponse
+except Exception:
+    FileResponse, HTMLResponse = None, None
+
+
+@app.get("/")
+@app.get("/index.html")
+def serve_index():
+    index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
+    if os.path.exists(index_path):
+        if FileResponse is not None:
+            return FileResponse(index_path)
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if HTMLResponse is not None:
+            return HTMLResponse(content)
+        return content
+    return {
+        "status": "healthy",
+        "service": "Chennai Traffic Intelligence Platform",
+        "version": "1.0.0"
+    }
+
+
 @app.get("/health")
 def health_check():
     return {

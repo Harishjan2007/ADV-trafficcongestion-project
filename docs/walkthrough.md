@@ -76,11 +76,18 @@ Follow this 10-step sequence to demonstrate the platform capabilities across all
 - **Action:** Click the **`Flow Vectors`** chip toggle in the filter bar.
 - **Observation:** Cyan animated flow vectors travel along the corridors, visually communicating tidal directional movement.
 
-### Step 10: Predictive ML Forecasting (+30m Horizon) (Review 3 / Phase 9)
+### Step 10: Multi-Horizon Predictive ML Forecasting (+15m, +30m, +45m, +60m)
 - **Action:**
-  1. Click the **`+30m ML Forecast`** chip toggle in the filter bar.
-  2. Open the **`✦ ML Forecast`** tab in the Location Intelligence Drawer.
-- **Observation:** The predictive map layer lights up in violet/purple. The forecast chart displays the observed baseline against the +30m predicted curve with shaded 95% confidence bands and the **Top Contributing Drivers** (e.g. *Rainfall Accumulation +42%, Upstream Inflow +31%*).
+  1. Click the **`Forecast View`** chip toggle in the top filter bar.
+  2. Switch between **`+15m`**, **`+30m`**, **`+45m`**, and **`+60m`** using the multi-horizon button group.
+  3. Open the **`✦ ML Forecast`** tab in the Location Intelligence Drawer.
+- **Observation:**
+  - **Status Indicator:** Shows `HistGradientBoostingRegressor v1.0 ACTIVE` connected to FastAPI, or graceful standalone fallback.
+  - **Dynamic Map Glow:** Road segments adjust in purple/severity hues reflecting forecasted congestion index for the selected horizon.
+  - **Multi-Horizon Progression Chart (`chart-ml-horizons-comp`):** Interactive bar chart displaying predicted CI across +15m, +30m, +45m, and +60m horizons side-by-side with the observed baseline, accompanied by automated queue trajectory diagnosis (*e.g., DETERIORATING +6.2 CI build-up vs STABLE*).
+  - **Detailed ML KPIs:** Displays predicted CI, estimated speed & deficit, projected vehicle count & capacity utilization, and calibrated model confidence percentage.
+  - **24h Forecast Curve (`chart-ml-forecast`):** Dual-series timeline comparing observed 24h diurnal curve against the ML forecast curve with shaded statistical confidence bands.
+  - **Instance-Level SHAP Feature Attribution (`chart-feature-importance`):** Horizontal bar chart ranking dynamic feature drivers (e.g., *Corridor Inflow Volume Lag, Preceding Speed Deficit, Monsoon Rainfall Intensity*) color-coded by direction (red = increases congestion, green = decreases congestion).
 
 ---
 
@@ -88,7 +95,7 @@ Follow this 10-step sequence to demonstrate the platform capabilities across all
 
 | Data Tier | Implementation | Where Seen in Platform |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | Real Chennai road vector linestrings and landmark junction coordinates. | Map canvas geometry, road names, speed limits. |
+| **`OBSERVED`** | Real Chennai road vector linestrings, OpenStreetMap metadata, and baseline hourly corridor states. | Map canvas geometry, road names, speed limits, observed baseline curves. |
 | **`DERIVED`** | Mathematical formulas for $U$, $R_v$, $CI$, Priority Score ($PS$), Pearson $r$, K-Means centroids. | KPI cards, Leaderboard rankings, Correlation matrix, Radar chart. |
-| **`PREDICTED`** | Spatio-temporal ML predictions from `ST-GCN-Chennai-v2.1` with confidence metrics. | Purple map layer, Forecast chart with 95% band, Feature importance chart. |
-| **`SIMULATED`** | Calibrated 24-hour synthetic fixtures representing Chennai diurnal patterns. | Explicitly labeled **`SIMULATED DATA`** badge in header and drawer. |
+| **`PREDICTED`** | Authentic Machine Learning predictions from trained `HistGradientBoostingRegressor v1.0` model artifacts over +15m, +30m, +45m, and +60m horizons with empirical uncertainty intervals and dynamic SHAP feature attributions. | Violet map layer, Multi-horizon progression chart, Forecast curve with statistical band, Dynamic feature importance chart. |
+| **`SIMULATED`** | Calibrated 14-day multi-corridor benchmark dataset representing Chennai diurnal traffic dynamics. | Prominently watermarked **`SIMULATED BENCHMARK DATA`** disclaimer in header and drawer. |

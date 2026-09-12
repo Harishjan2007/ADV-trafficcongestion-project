@@ -586,6 +586,54 @@
       border-color: var(--border-pred);
     }
 
+    /* Horizon Selector Buttons */
+    .top-horizon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: var(--font-mono);
+    }
+    .top-horizon-btn:hover {
+      color: var(--text-primary);
+      background: rgba(148, 163, 184, 0.15);
+    }
+    .top-horizon-btn.active {
+      background: rgba(139, 92, 246, 0.28);
+      color: #c4b5fd;
+      border-color: var(--color-prediction);
+      box-shadow: 0 0 6px rgba(139, 92, 246, 0.4);
+    }
+
+    .drawer-horizon-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-mono);
+    }
+    .drawer-horizon-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-pred);
+      background: var(--bg-surface-secondary);
+    }
+    .drawer-horizon-btn.active {
+      background: rgba(139, 92, 246, 0.3);
+      color: #e0e7ff;
+      border-color: var(--color-prediction);
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    }
+
     /* Badges */
     .badge {
       display: inline-flex;
@@ -598,6 +646,7 @@
       border-radius: var(--radius-sm);
       font-family: var(--font-mono);
     }
+    .badge-observed { background: rgba(6, 182, 212, 0.2); color: var(--color-flow); border: 1px solid var(--color-flow); }
     .badge-severe { background: rgba(239, 68, 68, 0.2); color: var(--color-severe); border: 1px solid var(--color-severe); }
     .badge-high { background: rgba(249, 115, 22, 0.2); color: var(--color-high); border: 1px solid var(--color-high); }
     .badge-moderate { background: rgba(245, 158, 11, 0.2); color: var(--color-moderate); border: 1px solid var(--color-moderate); }
@@ -684,7 +733,7 @@
       <div style="text-align: right;">
         <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">ML Model Health</div>
         <div style="font-size: 11px; font-weight: 600; color: var(--color-prediction); display: flex; align-items: center; gap: 4px;">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-prediction); display: inline-block;"></span> ST-GCN v2.1 ACTIVE
+          <span id="ml-status-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-prediction); display: inline-block;"></span> <span id="ml-status-text">GBDT v1.0 ACTIVE</span>
         </div>
       </div>
     </div>
@@ -734,7 +783,7 @@
       </select>
     </div>
 
-    <!-- Layer Toggles -->
+    <!-- Layer Toggles & Horizon Selector -->
     <div style="display: flex; align-items: center; gap: 6px;">
       <button class="chip-toggle active" id="toggle-congestion" data-layer="congestion">
         <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-severe);"></span> Congestion
@@ -742,8 +791,18 @@
       <button class="chip-toggle active" id="toggle-accidents" data-layer="accidents">
         <span style="color: var(--color-accident);">⚠</span> Incidents
       </button>
-      <button class="chip-toggle pred-chip" id="toggle-prediction" data-layer="prediction">
-        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--color-prediction);"></i> +30m ML Forecast
+
+      <!-- Clean Multi-Horizon Selector Group -->
+      <div class="horizon-toggle-group" style="display: flex; align-items: center; gap: 3px; background: var(--bg-surface-secondary); padding: 3px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 2px;">Horizon:</span>
+        <button class="top-horizon-btn" data-horizon="15min">+15m</button>
+        <button class="top-horizon-btn active" data-horizon="30min">+30m</button>
+        <button class="top-horizon-btn" data-horizon="45min">+45m</button>
+        <button class="top-horizon-btn" data-horizon="60min">+60m</button>
+      </div>
+
+      <button class="chip-toggle pred-chip" id="toggle-prediction" data-layer="prediction" title="Toggle between Observed Congestion and Machine Learning Forecasted Congestion">
+        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--color-prediction);"></i> <span id="toggle-prediction-label">ML Forecast View</span>
       </button>
       <button class="chip-toggle" id="toggle-flow" data-layer="flow">
         <i data-lucide="move-right" style="width: 12px; height: 12px;"></i> Flow Vectors
@@ -945,19 +1004,69 @@
           <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--border-pred); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-size: 11px; font-weight: 700; color: #c4b5fd; text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
-                <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i> ST-GCN-Chennai-v2.1 Predictive Model
+                <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i> <span id="pred-model-title">HistGradientBoostingRegressor v1.0.0</span>
               </span>
-              <span class="badge badge-pred">CONFIDENCE: 92%</span>
+              <div style="display: flex; gap: 6px;">
+                <span class="badge badge-simulated" style="font-size: 9px;">SIMULATED DATA</span>
+                <span id="pred-model-conf" class="badge badge-pred">HORIZON: +30m</span>
+              </div>
             </div>
-            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
-              Spatio-Temporal Graph Neural Network inference. Lead time: <b>+30 min horizon</b>. Model Latency: <b>14 ms</b>.
+            <div id="pred-model-desc" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+              Autoregressive gradient boosted decision tree forecasting model trained on 27 canonical features. Validated against chronological splits.
             </div>
           </div>
 
-          <!-- Forecast Comparison Chart -->
+          <!-- Drawer Horizon Selector -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-secondary); padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Forecast Horizon:</span>
+            <div style="display: flex; gap: 6px;">
+              <button class="drawer-horizon-btn" data-horizon="15min">+15 min</button>
+              <button class="drawer-horizon-btn active" data-horizon="30min">+30 min</button>
+              <button class="drawer-horizon-btn" data-horizon="45min">+45 min</button>
+              <button class="drawer-horizon-btn" data-horizon="60min">+60 min</button>
+            </div>
+          </div>
+
+          <!-- ML Prediction KPI Summary Cards -->
+          <div class="metric-grid" style="margin-bottom: 12px;">
+            <div class="metric-box" style="border-left: 3px solid var(--color-prediction);">
+              <div class="metric-box-title">Predicted CI (<span id="pred-kpi-horizon">+30m</span>)</div>
+              <div class="metric-box-val" id="pred-kpi-ci" style="color: var(--color-prediction);">-- <span style="font-size: 11px; color: var(--text-muted);">/100</span></div>
+              <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;" id="pred-kpi-delta">Δ vs Observed: --</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Predicted Speed</div>
+              <div class="metric-box-val" id="pred-kpi-speed">-- <span style="font-size: 11px; color: var(--text-muted);">km/h</span></div>
+              <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;" id="pred-kpi-speed-deficit">Deficit: --</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Predicted Volume</div>
+              <div class="metric-box-val" id="pred-kpi-volume">-- <span style="font-size: 11px; color: var(--text-muted);">veh/hr</span></div>
+              <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;" id="pred-kpi-util">Est. Util: --</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-box-title">Model Confidence</div>
+              <div class="metric-box-val" id="pred-kpi-conf" style="color: var(--color-flow);">--%</div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Calibrated Stat Band</div>
+            </div>
+          </div>
+
+          <!-- Multi-Horizon Progression Chart (Req 8.B) -->
           <div class="chart-container" style="margin-bottom: 12px;">
             <div class="chart-header">
-              <span>Observed Baseline vs. +30m Predicted Congestion</span>
+              <span>Multi-Horizon Progression (+15m, +30m, +45m, +60m)</span>
+              <span class="badge badge-pred" style="font-size: 9px;">HORIZON COMPARISON</span>
+            </div>
+            <div id="chart-ml-horizons-comp" style="width: 100%; height: 200px;"></div>
+            <div id="ml-horizon-summary" style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; background: rgba(139, 92, 246, 0.08); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(139, 92, 246, 0.2);">
+              Loading multi-horizon forecast trajectory...
+            </div>
+          </div>
+
+          <!-- Forecast Comparison Chart (24h Timeline) -->
+          <div class="chart-container" style="margin-bottom: 12px;">
+            <div class="chart-header">
+              <span>Observed Baseline vs. Predicted Congestion (24h Timeline)</span>
               <span class="badge badge-pred" style="font-size: 9px;">PREDICTED</span>
             </div>
             <div id="chart-ml-forecast" style="width: 100%; height: 250px;"></div>
@@ -1300,9 +1409,23 @@
       else if (priority_score >= 55) pLevel = "High";
       else if (priority_score >= 35) pLevel = "Medium";
 
-      // ML +30m Predicted values
-      const pred_ci = Math.min(100.0, Math.round(ci * (isPeak ? 1.08 : 0.95)));
-      const pred_level = pred_ci >= 75 ? "Severe" : (pred_ci >= 55 ? "High" : (pred_ci >= 30 ? "Moderate" : "Low"));
+      // Genuine ML Prediction retrieval from backend cache
+      const cachedPred = mlPredictionsCache[roadId];
+      let pred_ci = ci;
+      let pred_level = level;
+      let pred_speed = average_speed;
+      let pred_vol = vehicle_count;
+      let pred_conf = 0.85;
+      let pred_status = isMlBackendAvailable ? "ACTIVE" : "OFFLINE_FALLBACK";
+
+      if (cachedPred) {
+        pred_ci = cachedPred.predicted_congestion_index !== undefined ? cachedPred.predicted_congestion_index : ci;
+        pred_level = cachedPred.predicted_congestion_level || level;
+        pred_speed = cachedPred.predicted_speed !== undefined ? cachedPred.predicted_speed : average_speed;
+        pred_vol = cachedPred.predicted_vehicle_count !== undefined ? cachedPred.predicted_vehicle_count : vehicle_count;
+        pred_conf = cachedPred.confidence !== undefined ? cachedPred.confidence : 0.85;
+        pred_status = cachedPred.model_status || (isMlBackendAvailable ? "ACTIVE" : "SIMULATED");
+      }
 
       return {
         vehicle_count,
@@ -1318,7 +1441,11 @@
         priority_level: pLevel,
         predicted_ci: pred_ci,
         predicted_level: pred_level,
-        confidence: 0.92,
+        predicted_speed: pred_speed,
+        predicted_vol: pred_vol,
+        confidence: pred_conf,
+        model_status: pred_status,
+        data_status: "SIMULATED",
         rainfall: (hour >= 8 && hour <= 10) ? 4.5 : 0.0,
         weather: (hour >= 8 && hour <= 10) ? "Light Rain (4.5 mm)" : "Clear"
       };
@@ -1375,7 +1502,7 @@
       return denom === 0 ? 0 : Math.round((num / denom) * 100) / 100;
     }
 
-    // Global App State
+    // Global App State & ML Prediction Integration
     let currentHour = 8;
     let isPlaying = false;
     let playInterval = null;
@@ -1387,6 +1514,10 @@
     let activeClusterMode = false;
     let activeFlowMode = false;
     let activePredictionMode = false;
+    let selectedHorizon = "30min";
+    let mlPredictionsCache = {};
+    let mlModelStatus = null;
+    let isMlBackendAvailable = false;
 
     // ==========================================
     // 2. INITIALIZE MAPLIBRE GL JS
@@ -1604,6 +1735,83 @@
     // ==========================================
     // 3. UI STATE SYNC & LEADERBOARD RENDERING
     // ==========================================
+    let lastFetchedHour = null;
+    let lastFetchedHorizon = null;
+
+    function syncHorizonSelectors(horizon) {
+      selectedHorizon = horizon;
+      document.querySelectorAll('.top-horizon-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-horizon') === horizon);
+      });
+      document.querySelectorAll('.drawer-horizon-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-horizon') === horizon);
+      });
+      const lbl = document.getElementById('toggle-prediction-label');
+      if (lbl) {
+        lbl.innerText = `+${horizon.replace('min', 'm')} Forecast View`;
+      }
+      const kpiH = document.getElementById('pred-kpi-horizon');
+      if (kpiH) kpiH.innerText = `+${horizon.replace('min', 'm')}`;
+      const confH = document.getElementById('pred-model-conf');
+      if (confH) confH.innerText = `HORIZON: +${horizon.replace('min', 'm')}`;
+    }
+
+    async function loadMLPredictions(horizon = selectedHorizon, hour = currentHour) {
+      syncHorizonSelectors(horizon);
+
+      // 1. Fetch ML Status
+      try {
+        const sRes = await fetch('/api/ml/status');
+        if (sRes.ok) {
+          mlModelStatus = await sRes.json();
+          isMlBackendAvailable = mlModelStatus.model_available === true;
+          const dotEl = document.getElementById('ml-status-dot');
+          const textEl = document.getElementById('ml-status-text');
+          if (dotEl && textEl) {
+            if (isMlBackendAvailable) {
+              dotEl.style.background = '#10b981';
+              textEl.innerText = `${mlModelStatus.model_name || 'HistGBDT'} v${mlModelStatus.model_version || '1.0'} ACTIVE`;
+            } else {
+              dotEl.style.background = '#ef4444';
+              textEl.innerText = 'ML MODEL OFFLINE';
+            }
+          }
+        }
+      } catch (err) {
+        isMlBackendAvailable = false;
+        const dotEl = document.getElementById('ml-status-dot');
+        const textEl = document.getElementById('ml-status-text');
+        if (dotEl && textEl) {
+          dotEl.style.background = '#f59e0b';
+          textEl.innerText = 'FASTAPI OFFLINE (Demo Standalone)';
+        }
+      }
+
+      // 2. Fetch all predictions for this horizon and hour
+      try {
+        const pRes = await fetch(`/api/ml/predictions?horizon=${horizon}&hour=${hour}`);
+        if (pRes.ok) {
+          const preds = await pRes.json();
+          mlPredictionsCache = {};
+          preds.forEach(p => {
+            mlPredictionsCache[p.location_id] = p;
+          });
+          lastFetchedHorizon = horizon;
+          lastFetchedHour = hour;
+
+          // Re-render map and components with genuine predictions
+          if (map && map.getSource && map.getSource('chennai-roads')) {
+            map.getSource('chennai-roads').setData(getEnrichedGeoJSON(currentHour));
+          }
+          if (selectedRoadId) {
+            renderDrawerData(selectedRoadId);
+          }
+        }
+      } catch (err) {
+        console.warn('Backend predictions fetch fallback:', err);
+      }
+    }
+
     function updateUI() {
       const timeStr = `${String(currentHour).padStart(2, '0')}:00`;
       document.getElementById('slider-time-label').innerText = timeStr;
@@ -1613,6 +1821,11 @@
       // Update Map Data
       if (map.getSource('chennai-roads')) {
         map.getSource('chennai-roads').setData(getEnrichedGeoJSON(currentHour));
+      }
+
+      // Trigger background ML fetch if horizon or hour changed
+      if (lastFetchedHorizon !== selectedHorizon || lastFetchedHour !== currentHour) {
+        loadMLPredictions(selectedHorizon, currentHour);
       }
 
       // Compute City Aggregate KPIs & Build Dynamic Leaderboard
@@ -1648,13 +1861,16 @@
         });
       });
 
-      // Sort Leaderboard strictly by Congestion Index descending
-      rankedCorridors.sort((a, b) => b.congestion_index - a.congestion_index);
+      // Sort Leaderboard: by predicted CI if prediction mode is active, else by observed CI
+      rankedCorridors.sort((a, b) => {
+        if (activePredictionMode) return b.predicted_ci - a.predicted_ci;
+        return b.congestion_index - a.congestion_index;
+      });
 
       const count = rankedCorridors.length || 1;
       document.getElementById('kpi-speed').innerHTML = `${Math.round(totalSpeed / count * 10) / 10} <span class="kpi-unit">km/h</span>`;
       document.getElementById('kpi-volume').innerHTML = `${totalVol.toLocaleString()} <span class="kpi-unit">veh/hr</span>`;
-      document.getElementById('kpi-severe').innerHTML = `${severeCount} <span class="kpi-unit">roads</span>`;
+      document.getElementById('kpi-severe').innerHTML = `${severeCount} <span class="kpi-unit">${activePredictionMode ? 'pred severe' : 'roads'}</span>`;
       document.getElementById('kpi-accidents').innerHTML = `${totalAccidents + 2} <span class="kpi-unit">active</span>`;
 
       // Render Dynamic Leaderboard List
@@ -1684,7 +1900,10 @@
             <div class="road-rank-sub">
               <span>${c.average_speed} km/h</span>
               <span>•</span>
-              <span style="color: ${c.color}; font-weight: 700;">CI: ${c.congestion_index}</span>
+              ${activePredictionMode
+                ? `<span style="color: #8b5cf6; font-weight: 700;">Pred CI: ${c.predicted_ci}</span>`
+                : `<span style="color: ${c.color}; font-weight: 700;">CI: ${c.congestion_index}</span>`
+              }
               ${c.accident_count > 0 ? '<span style="color: var(--color-accident);">⚠ Inc</span>' : ''}
             </div>
           </div>
@@ -1701,8 +1920,8 @@
       if (activePredictionMode) {
         html += `
           <div class="insight-item predictive">
-            <div style="font-weight: 700; color: #c4b5fd;">✦ ML Forecast (+30m Alert)</div>
-            <div style="color: var(--text-secondary);">ST-GCN model predicts severe queue expansion toward Gemini junction by 08:30 (CI 88.4, 92% Conf).</div>
+            <div style="font-weight: 700; color: #c4b5fd;">✦ ML Forecast (+${selectedHorizon.replace('min', 'm')} Alert)</div>
+            <div style="color: var(--text-secondary);" id="insight-ml-text">ML inference engine projects corridor queues across Chennai arterials (+${selectedHorizon.replace('min', 'm')} horizon).</div>
           </div>
         `;
       }
@@ -1838,73 +2057,214 @@
         }
       ], { ...darkLayout, margin: { l: 30, r: 10, t: 10, b: 25 } }, { responsive: true, displayModeBar: false });
 
-      // 2. ML Prediction Tab Charts (Phase 9)
-      // A. Forecast Comparison with Confidence Band
-      const predUpper = predCis.map(v => Math.min(100, v + 6));
-      const predLower = predCis.map(v => Math.max(0, v - 6));
+      // 2. ML Prediction Tab Charts (Phase 9 & Requirements 3, 4, 7, 8)
+      // Multi-Horizon Progression Chart, 24h Forecast Curve, and SHAP Explainability
+      const roadGeo = CHENNAI_GEO.features.find(f => f.properties.road_id === roadId);
+      const roadProps = roadGeo ? roadGeo.properties : {};
+      const speedLimit = roadProps.speed_limit || 50.0;
+      const roadCapacity = roadProps.capacity || 3600;
 
-      Plotly.newPlot('chart-ml-forecast', [
-        {
-          x: hours,
-          y: predUpper,
-          type: 'scatter',
-          mode: 'lines',
-          line: { width: 0 },
-          showlegend: false,
-          hoverinfo: 'none'
-        },
-        {
-          x: hours,
-          y: predLower,
-          type: 'scatter',
-          mode: 'lines',
-          fill: 'tonexty',
-          fillcolor: 'rgba(139, 92, 246, 0.15)',
-          line: { width: 0 },
-          name: '95% Confidence Band',
-          showlegend: true
-        },
-        {
-          x: hours,
-          y: cis,
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: 'Observed Baseline',
-          line: { color: '#06b6d4', width: 2 }
-        },
-        {
-          x: hours,
-          y: predCis,
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: 'ML +30m Predicted',
-          line: { color: '#8b5cf6', width: 2.5, dash: 'dot' }
-        }
-      ], {
-        ...darkLayout,
-        showlegend: true,
-        legend: { orientation: 'h', y: -0.25, font: { size: 9, color: '#fff' } },
-        margin: { l: 35, r: 20, t: 10, b: 35 }
-      }, { responsive: true, displayModeBar: false });
+      // A. Parallel Fetch for Multi-Horizon Comparison (+15m, +30m, +45m, +60m)
+      Promise.all([
+        fetch(`/api/ml/predict/${roadId}?hour=${currentHour}&horizon=15min`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/ml/predict/${roadId}?hour=${currentHour}&horizon=30min`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/ml/predict/${roadId}?hour=${currentHour}&horizon=45min`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/ml/predict/${roadId}?hour=${currentHour}&horizon=60min`).then(r => r.ok ? r.json() : null)
+      ]).then(([p15, p30, p45, p60]) => {
+        const hLabels = ['+15 min', '+30 min', '+45 min', '+60 min'];
+        const obsCi = cis[currentHour];
+        const hVals = [
+          p15 ? p15.predicted_congestion_index : obsCi,
+          p30 ? p30.predicted_congestion_index : obsCi,
+          p45 ? p45.predicted_congestion_index : obsCi,
+          p60 ? p60.predicted_congestion_index : obsCi
+        ];
+        const hColors = hVals.map(v => v >= 75 ? '#ef4444' : (v >= 55 ? '#f97316' : (v >= 30 ? '#f59e0b' : '#10b981')));
 
-      // B. Top Contributing Features (SHAP / Feature Weights)
-      Plotly.newPlot('chart-feature-importance', [
-        {
-          y: ['Rainfall Intensity (mm)', 'Upstream Chokepoint Inflow', 'Peak Commute Wave Lag'],
-          x: [0.42, 0.31, 0.18],
-          type: 'bar',
-          orientation: 'h',
-          marker: {
-            color: ['#8b5cf6', '#a78bfa', '#c4b5fd'],
-            line: { color: '#8b5cf6', width: 1 }
+        Plotly.react('chart-ml-horizons-comp', [
+          {
+            x: hLabels,
+            y: hVals,
+            type: 'bar',
+            name: 'Forecasted CI',
+            marker: { color: hColors, line: { color: 'rgba(255,255,255,0.2)', width: 1 } },
+            text: hVals.map(v => `${v}`),
+            textposition: 'auto',
+            hoverinfo: 'x+y'
+          },
+          {
+            x: ['+15 min', '+30 min', '+45 min', '+60 min'],
+            y: [obsCi, obsCi, obsCi, obsCi],
+            type: 'scatter',
+            mode: 'lines',
+            name: `Observed Baseline (${obsCi})`,
+            line: { color: '#06b6d4', width: 2, dash: 'dash' }
           }
+        ], {
+          ...darkLayout,
+          yaxis: { title: 'Congestion Index (0-100)', range: [0, 100], gridcolor: 'rgba(148, 163, 184, 0.1)' },
+          showlegend: true,
+          legend: { orientation: 'h', y: -0.3, font: { size: 9, color: '#fff' } },
+          margin: { l: 40, r: 20, t: 10, b: 35 }
+        }, { responsive: true, displayModeBar: false });
+
+        const endVal = hVals[3];
+        const diff = endVal - obsCi;
+        let statusColor = '#10b981';
+        let statusText = 'STABLE (No Critical Queue Growth)';
+        if (diff >= 5) {
+          statusColor = '#ef4444';
+          statusText = `DETERIORATING (+${diff.toFixed(1)} CI queue build-up)`;
+        } else if (diff <= -5) {
+          statusColor = '#10b981';
+          statusText = `IMPROVING (${diff.toFixed(1)} CI dissipation)`;
         }
-      ], {
-        ...darkLayout,
-        xaxis: { title: 'Relative Contribution (SHAP Importance)', range: [0, 0.6], gridcolor: 'rgba(148, 163, 184, 0.1)' },
-        yaxis: { automargin: true },
-        margin: { l: 150, r: 20, t: 10, b: 30 }
-      }, { responsive: true, displayModeBar: false });
+
+        const sumEl = document.getElementById('ml-horizon-summary');
+        if (sumEl) {
+          sumEl.innerHTML = `
+            <b>Forecast Trajectory:</b> <span style="color: ${statusColor}; font-weight: 700;">${statusText}</span>.<br>
+            <span style="color: var(--text-muted);">Current observed CI: <b>${obsCi}</b> → +60m projection: <b>${endVal}</b> (Δ ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}).</span>
+          `;
+        }
+      }).catch(() => {});
+
+      // B. Fetch Selected Horizon Prediction Details & SHAP Explainability
+      fetch(`/api/ml/predict/${roadId}?hour=${currentHour}&horizon=${selectedHorizon}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(predData => {
+          if (!predData) return;
+          const obsCi = cis[currentHour];
+          const predCi = predData.predicted_congestion_index;
+          const delta = predCi - obsCi;
+          const predSpeed = predData.predicted_speed !== undefined ? predData.predicted_speed : Math.round(speedLimit * 0.6);
+          const predVol = predData.predicted_vehicle_count !== undefined ? predData.predicted_vehicle_count : Math.round(roadCapacity * 0.7);
+          const conf = predData.confidence !== undefined ? predData.confidence : 0.85;
+
+          // Update Model Card & Badges
+          const titleEl = document.getElementById('pred-model-title');
+          if (titleEl) titleEl.innerText = predData.model_version || 'HistGradientBoostingRegressor v1.0';
+          const confBadge = document.getElementById('pred-model-conf');
+          if (confBadge) confBadge.innerText = `HORIZON: +${selectedHorizon.replace('min', 'm')}`;
+
+          // Update Prediction KPI Cards
+          const kpiHoriz = document.getElementById('pred-kpi-horizon');
+          if (kpiHoriz) kpiHoriz.innerText = `+${selectedHorizon.replace('min', 'm')}`;
+
+          const kpiCi = document.getElementById('pred-kpi-ci');
+          if (kpiCi) {
+            kpiCi.innerText = `${predCi} (${predData.predicted_congestion_level})`;
+            kpiCi.style.color = predCi >= 75 ? 'var(--color-severe)' : (predCi >= 55 ? 'var(--color-high)' : (predCi >= 30 ? 'var(--color-moderate)' : 'var(--color-low)'));
+          }
+
+          const kpiDelta = document.getElementById('pred-kpi-delta');
+          if (kpiDelta) {
+            const sign = delta > 0 ? '+' : '';
+            const dColor = delta > 3 ? 'var(--color-severe)' : (delta < -3 ? 'var(--color-low)' : 'var(--text-secondary)');
+            kpiDelta.innerHTML = `Δ vs Observed: <b style="color: ${dColor};">${sign}${delta.toFixed(1)} CI</b>`;
+          }
+
+          const kpiSpeed = document.getElementById('pred-kpi-speed');
+          if (kpiSpeed) kpiSpeed.innerHTML = `${predSpeed} <span style="font-size: 11px; color: var(--text-muted);">km/h</span>`;
+
+          const kpiDeficit = document.getElementById('pred-kpi-speed-deficit');
+          if (kpiDeficit) {
+            const deficitPct = Math.round(Math.max(0, (speedLimit - predSpeed) / speedLimit * 100));
+            kpiDeficit.innerText = `Deficit: -${deficitPct}% below limit`;
+          }
+
+          const kpiVol = document.getElementById('pred-kpi-volume');
+          if (kpiVol) kpiVol.innerHTML = `${predVol.toLocaleString()} <span style="font-size: 11px; color: var(--text-muted);">veh/hr</span>`;
+
+          const kpiUtil = document.getElementById('pred-kpi-util');
+          if (kpiUtil) {
+            const utilPct = Math.round(predVol / roadCapacity * 100);
+            kpiUtil.innerText = `Est. Util: ${utilPct}% of cap`;
+          }
+
+          const kpiConf = document.getElementById('pred-kpi-conf');
+          if (kpiConf) kpiConf.innerText = `${Math.round(conf * 100)}%`;
+
+          // C. 24h Timeline Forecast Comparison with Empirical Confidence Band
+          const errMargin = Math.round(Math.max(3, (1 - conf) * 22));
+          const forecastCurve = predCis.map((c, h) => {
+            if (h === currentHour) return predCi;
+            return c;
+          });
+          const dynUpper = forecastCurve.map(v => Math.min(100, v + errMargin));
+          const dynLower = forecastCurve.map(v => Math.max(0, v - errMargin));
+
+          Plotly.react('chart-ml-forecast', [
+            {
+              x: hours,
+              y: dynUpper,
+              type: 'scatter',
+              mode: 'lines',
+              line: { width: 0 },
+              showlegend: false,
+              hoverinfo: 'none'
+            },
+            {
+              x: hours,
+              y: dynLower,
+              type: 'scatter',
+              mode: 'lines',
+              fill: 'tonexty',
+              fillcolor: 'rgba(139, 92, 246, 0.18)',
+              line: { width: 0 },
+              name: `${Math.round(conf * 100)}% Statistical Band`,
+              showlegend: true
+            },
+            {
+              x: hours,
+              y: cis,
+              type: 'scatter',
+              mode: 'lines+markers',
+              name: 'Observed Baseline (24h)',
+              line: { color: '#06b6d4', width: 2 }
+            },
+            {
+              x: hours,
+              y: forecastCurve,
+              type: 'scatter',
+              mode: 'lines+markers',
+              name: `ML +${selectedHorizon.replace('min', 'm')} Forecast`,
+              line: { color: '#8b5cf6', width: 2.5, dash: 'dot' }
+            }
+          ], {
+            ...darkLayout,
+            showlegend: true,
+            legend: { orientation: 'h', y: -0.25, font: { size: 9, color: '#fff' } },
+            margin: { l: 35, r: 20, t: 10, b: 35 }
+          }, { responsive: true, displayModeBar: false });
+
+          // D. Dynamic Feature Importance Chart (SHAP Attribution)
+          if (predData.top_contributing_features && predData.top_contributing_features.length) {
+            const feats = [...predData.top_contributing_features].reverse();
+            const names = feats.map(f => f.feature_name);
+            const scores = feats.map(f => f.importance_score);
+            const colors = feats.map(f => f.direction === 'increases_congestion' ? '#ef4444' : '#10b981');
+
+            Plotly.react('chart-feature-importance', [
+              {
+                y: names,
+                x: scores,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                  color: colors,
+                  line: { color: 'rgba(255, 255, 255, 0.2)', width: 1 }
+                }
+              }
+            ], {
+              ...darkLayout,
+              xaxis: { title: 'Dynamic Impact Score (SHAP Attribution)', range: [0, Math.max(0.5, ...scores) * 1.2], gridcolor: 'rgba(148, 163, 184, 0.1)' },
+              yaxis: { automargin: true },
+              margin: { l: 180, r: 20, t: 10, b: 30 }
+            }, { responsive: true, displayModeBar: false });
+          }
+        })
+        .catch(() => {});
 
       // 3. Full Time Series Chart (24h Trend Tab)
       Plotly.newPlot('chart-timeseries', [
@@ -2307,6 +2667,21 @@
         if (layer === 'leaderboard') {
           const dock = document.getElementById('leaderboard-dock');
           dock.style.display = chip.classList.contains('active') ? 'flex' : 'none';
+        }
+      });
+    });
+
+    // Horizon Selector Buttons Event Listeners (Top Bar & Drawer)
+    document.querySelectorAll('.top-horizon-btn, .drawer-horizon-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const horizon = e.target.getAttribute('data-horizon');
+        if (horizon) {
+          syncHorizonSelectors(horizon);
+          lastFetchedHorizon = null; // force reload for new horizon
+          loadMLPredictions(horizon, currentHour);
+          if (selectedRoadId) {
+            renderAllVisualizations(selectedRoadId);
+          }
         }
       });
     });

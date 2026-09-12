@@ -78,7 +78,7 @@ The ML service supplies predictions conforming to the following JSON structure:
     "model_metadata": {
       "type": "object",
       "properties": {
-        "model_name": { "type": "string", "examples": ["ST-GCN-Chennai-v2", "XGBoost-Traffic-Lag3"] },
+        "model_name": { "type": "string", "examples": ["HistGradientBoosting-Chennai-v1", "RandomForest-Chennai-v1"] },
         "model_version": { "type": "string", "examples": ["2.1.0"] },
         "inference_latency_ms": { "type": "number" }
       }

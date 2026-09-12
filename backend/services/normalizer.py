@@ -33,8 +33,8 @@ def calculate_derived_metrics(
     speed_reduction = round(speed_deficit / limit, 4)
 
     # 3. Congestion Index (CI)
-    # Composite: 45% Volume Utilization (capped at 1.5) + 55% Speed Deficit
-    norm_util = min(utilization, 1.5) / 1.5  # 0.0 to 1.0
+    # Composite: 45% Volume Utilization (normalized to gridlock threshold at 1.2 V/C) + 55% Speed Deficit
+    norm_util = min(1.0, utilization / 1.2)  # 0.0 to 1.0
     raw_ci = (0.45 * norm_util * 100.0) + (0.55 * speed_reduction * 100.0)
     congestion_index = round(min(100.0, max(0.0, raw_ci)), 1)
 

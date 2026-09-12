@@ -100,6 +100,13 @@ class MLPredictionPayload(BaseModel):
     confidence: float
     model_version: Optional[str] = "1.0.0"
     top_contributing_features: Optional[List[FeatureContribution]] = None
+    road_name: Optional[str] = None
+    observed_congestion_index: Optional[float] = None
+    observed_congestion_level: Optional[str] = None
+    observed_speed: Optional[float] = None
+    observed_vehicle_count: Optional[int] = None
+    data_status: Optional[str] = "SIMULATED"
+    model_status: Optional[str] = "ACTIVE"
 
 
 class AutomatedInsight(BaseModel):

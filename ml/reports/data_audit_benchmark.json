@@ -1,0 +1,51 @@
+{
+  "dataset_path": "data/synthetic/chennai_traffic_multiday_benchmark.json",
+  "dataset_name": "Chennai Urban Arterial Calibrated Multi-Day Development Benchmark",
+  "is_simulated": true,
+  "data_classification": "SIMULATED",
+  "audit_timestamp": "2026-09-12T19:22:00+05:30",
+  "status": "READY",
+  "gate_passed": true,
+  "total_records": 4704,
+  "unique_roads": 14,
+  "road_list": [
+    "ROAD_100FT_1",
+    "ROAD_ANNA_SALAI_1",
+    "ROAD_ANNA_SALAI_2",
+    "ROAD_ARCOT_1",
+    "ROAD_ECR_1",
+    "ROAD_GST_1",
+    "ROAD_GST_2",
+    "ROAD_MARINA_1",
+    "ROAD_MOUNT_POON_1",
+    "ROAD_OMR_1",
+    "ROAD_OMR_2",
+    "ROAD_PH_1",
+    "ROAD_PH_2",
+    "ROAD_SP_ROAD_1"
+  ],
+  "unique_timestamps": 336,
+  "unique_days": 14,
+  "date_range": {
+    "start": "2026-08-17",
+    "end": "2026-08-30"
+  },
+  "sampling_frequency": "60 minutes",
+  "missing_values": {
+    "vehicle_count": 0,
+    "average_speed": 0,
+    "congestion_index": 0,
+    "weather": 0,
+    "accidents": 0
+  },
+  "missing_road_ids": 0,
+  "missing_timestamps": 0,
+  "duplicate_records": 0,
+  "target_construction_feasibility": "Feasible",
+  "observations_per_road_summary": {
+    "min": 336,
+    "max": 336,
+    "avg": 336.0
+  },
+  "failure_reasons": []
+}

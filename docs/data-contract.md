@@ -67,7 +67,7 @@ $$R_v = \max\left(0.0, \, \frac{\text{speed\_limit} - \text{average\_speed}}{\te
 
 ### C. Congestion Index ($CI$)
 A standardized composite index normalized to $[0, 100]$:
-$$CI = \min\left(100.0, \, \left(0.45 \cdot \min(U, 1.5) \cdot \frac{100}{1.5} + 0.55 \cdot R_v \cdot 100\right)\right)$$
+$$CI = \min\left(100.0, \, \left(0.45 \cdot \min\left(1.0, \frac{U}{1.2}\right) \cdot 100 + 0.55 \cdot R_v \cdot 100\right)\right)$$
 
 ### D. Decision Support Priority Score Methodology ($PS$)
 The Priority Score is designed exclusively as an operational **Decision Support** indicator for traffic dispatchers and authorities to triage congested corridors and incident hotspots. It does NOT perform autonomous signal control.
