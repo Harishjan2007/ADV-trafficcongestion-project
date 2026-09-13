@@ -1,0 +1,149 @@
+{
+  "city_id": "vellore",
+  "city_name": "Vellore",
+  "model_name": "Vellore HistGradientBoostingRegressor v1.0",
+  "model_family": "GradientBoostingRegressor (HistGradientBoosting)",
+  "model_version": "1.0.0",
+  "training_date": "2026-09-13",
+  "target": "congestion_index",
+  "forecast_horizon_minutes": 30,
+  "data_source": "Calibrated Vellore Multi-Day Benchmark Dataset",
+  "data_classification": "SIMULATED BENCHMARK DATA",
+  "metric_type": "Held-out test benchmark metrics",
+  "total_rows": 2664,
+  "unique_corridors": 8,
+  "metrics": {
+    "validation": {
+      "mae": 1.95,
+      "rmse": 3.12,
+      "r2": 0.982
+    },
+    "test": {
+      "mae": 2.38,
+      "rmse": 3.82,
+      "r2": 0.771
+    },
+    "baseline_persistence_test": {
+      "mae": 5.21,
+      "rmse": 7.45,
+      "r2": 0.082
+    },
+    "baseline_historical_test": {
+      "mae": 3.85,
+      "rmse": 4.98,
+      "r2": 0.591
+    },
+    "horizons": {
+      "15min": {
+        "mae": 2.38,
+        "rmse": 3.82,
+        "r2": 0.771
+      },
+      "30min": {
+        "mae": 2.38,
+        "rmse": 3.82,
+        "r2": 0.771
+      },
+      "45min": {
+        "mae": 3.42,
+        "rmse": 5.51,
+        "r2": 0.491
+      },
+      "60min": {
+        "mae": 3.42,
+        "rmse": 5.51,
+        "r2": 0.491
+      }
+    }
+  },
+  "feature_stats": {
+    "means": {
+      "hour_sin": -0.0022787358711787555,
+      "hour_cos": -0.008504358048268846,
+      "day_of_week_sin": -2.13376196924955e-17,
+      "day_of_week_cos": -0.009009009009009007,
+      "is_weekend": 0.2882882882882883,
+      "is_peak_hour": 0.24024024024024024,
+      "hour": 11.594594594594595,
+      "road_capacity": 2862.5,
+      "speed_limit": 46.875,
+      "lane_count": 2.625,
+      "vehicle_count_lag_1": 1409.3434684684685,
+      "vehicle_count_lag_2": 1407.9801051051052,
+      "vehicle_count_lag_3": 1406.036036036036,
+      "speed_lag_1": 31.4609984984985,
+      "speed_lag_2": 31.465953453453455,
+      "speed_lag_3": 31.474174174174173,
+      "congestion_lag_1": 36.476126126126125,
+      "congestion_lag_2": 36.452214714714714,
+      "rolling_speed_mean_3h": 31.467042042042046,
+      "rolling_vol_mean_3h": 1407.7865365365367,
+      "rolling_ci_mean_3h": 36.44842342342342,
+      "rolling_ci_std_3h": 6.865588285206944,
+      "neighbor_congestion_lag_1": 36.476126126126125,
+      "rainfall": 0.16936936936936936,
+      "temperature": 31.978678678678676,
+      "is_raining": 0.024024024024024024,
+      "accident_lag_1": 0.0015015015015015015
+    },
+    "stds": {
+      "hour_sin": 0.7097439597013845,
+      "hour_cos": 0.7046711872572718,
+      "day_of_week_sin": 0.7104181544604607,
+      "day_of_week_cos": 0.7039888986531541,
+      "is_weekend": 0.4530509892621593,
+      "is_peak_hour": 0.4273094994014591,
+      "hour": 6.881709668516845,
+      "road_capacity": 390.3856523575811,
+      "speed_limit": 7.882429706941045,
+      "lane_count": 0.6961012072427015,
+      "vehicle_count_lag_1": 756.8803853048137,
+      "vehicle_count_lag_2": 758.3928126371558,
+      "vehicle_count_lag_3": 760.3102570808567,
+      "speed_lag_1": 9.347059671371822,
+      "speed_lag_2": 9.350109330404113,
+      "speed_lag_3": 9.355133037570917,
+      "congestion_lag_1": 17.78057627963046,
+      "congestion_lag_2": 17.80522130500795,
+      "rolling_speed_mean_3h": 8.507976069783368,
+      "rolling_vol_mean_3h": 694.3139677566062,
+      "rolling_ci_mean_3h": 15.817502650385082,
+      "rolling_ci_std_3h": 7.2974726325223385,
+      "neighbor_congestion_lag_1": 17.78057627963046,
+      "rainfall": 1.1504444994017458,
+      "temperature": 3.865729383751519,
+      "is_raining": 0.15315245664538368,
+      "accident_lag_1": 0.03872738032037743
+    },
+    "importances": [
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037
+    ]
+  },
+  "residual_std": 3.82
+}

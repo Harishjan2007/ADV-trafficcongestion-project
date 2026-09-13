@@ -1,0 +1,58 @@
+{
+  "city_id": "vellore",
+  "city_name": "Vellore",
+  "feature_columns": [
+    "hour_sin",
+    "hour_cos",
+    "day_of_week_sin",
+    "day_of_week_cos",
+    "is_weekend",
+    "is_peak_hour",
+    "hour",
+    "road_capacity",
+    "speed_limit",
+    "lane_count",
+    "vehicle_count_lag_1",
+    "vehicle_count_lag_2",
+    "vehicle_count_lag_3",
+    "speed_lag_1",
+    "speed_lag_2",
+    "speed_lag_3",
+    "congestion_lag_1",
+    "congestion_lag_2",
+    "rolling_speed_mean_3h",
+    "rolling_vol_mean_3h",
+    "rolling_ci_mean_3h",
+    "rolling_ci_std_3h",
+    "neighbor_congestion_lag_1",
+    "rainfall",
+    "temperature",
+    "is_raining",
+    "accident_lag_1"
+  ],
+  "target_column": "congestion_index",
+  "forecast_horizons": [
+    "15min",
+    "30min",
+    "45min",
+    "60min"
+  ],
+  "congestion_thresholds": {
+    "Low": [
+      0.0,
+      30.0
+    ],
+    "Moderate": [
+      30.0,
+      55.0
+    ],
+    "High": [
+      55.0,
+      75.0
+    ],
+    "Severe": [
+      75.0,
+      100.0
+    ]
+  }
+}

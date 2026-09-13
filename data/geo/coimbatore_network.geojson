@@ -1,0 +1,331 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "city": "Coimbatore",
+    "city_id": "coimbatore",
+    "crs": "EPSG:4326 (WGS84)",
+    "description": "Coimbatore Metropolitan Area Major Arterial Network and Critical Junctions",
+    "data_classification": "BENCHMARK_GEOMETRY",
+    "updated_at": "2026-09-13"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_AVINASHI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9680, 11.0020],
+          [76.9750, 11.0055],
+          [76.9820, 11.0090],
+          [76.9915, 11.0135],
+          [77.0010, 11.0180]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_AVINASHI_1",
+        "road_name": "Avinashi Road Core (Uppilipalayam to Nava India)",
+        "zone": "Central Zone",
+        "road_type": "Express Arterial",
+        "speed_limit": 55.0,
+        "road_capacity": 4500,
+        "lane_count": 4,
+        "key_landmarks": ["Uppilipalayam Flyover", "Lakshmi Mills Jn", "PSG College of Technology", "Nava India"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_AVINASHI_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.0010, 11.0180],
+          [77.0140, 11.0245],
+          [77.0260, 11.0310],
+          [77.0420, 11.0390],
+          [77.0580, 11.0470]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_AVINASHI_2",
+        "road_name": "Avinashi Road IT Express (Peelamedu to Airport / KMCH)",
+        "zone": "East Zone",
+        "road_type": "Express Arterial",
+        "speed_limit": 60.0,
+        "road_capacity": 4800,
+        "lane_count": 4,
+        "key_landmarks": ["Peelamedu", "Hope College Flyover", "Coimbatore International Airport", "KMCH Junction"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_TRICHY_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9620, 10.9950],
+          [76.9720, 10.9965],
+          [76.9810, 10.9980],
+          [76.9910, 10.9995],
+          [77.0020, 11.0010]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_TRICHY_1",
+        "road_name": "Trichy Road Urban (Town Hall to Sungam)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 4000,
+        "lane_count": 4,
+        "key_landmarks": ["Town Hall", "Rainbow Junction", "Sungam Roundabout", "Ramanathapuram"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_TRICHY_2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.0020, 11.0010],
+          [77.0150, 11.0022],
+          [77.0280, 11.0035],
+          [77.0420, 11.0048],
+          [77.0560, 11.0060]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_TRICHY_2",
+        "road_name": "Trichy Road Eastern Arterial (Ramanathapuram to Singanallur)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3800,
+        "lane_count": 4,
+        "key_landmarks": ["Ramanathapuram Signal", "Singanallur Bus Stand", "Ondipudur Flyover"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_SATHY_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9690, 11.0180],
+          [76.9755, 11.0280],
+          [76.9820, 11.0380],
+          [76.9910, 11.0580],
+          [77.0020, 11.0790]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_SATHY_1",
+        "road_name": "Sathy Road IT Corridor (Gandhipuram to Saravanampatti)",
+        "zone": "North Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 4200,
+        "lane_count": 4,
+        "key_landmarks": ["Gandhipuram GP Signal", "Ganapathy Bus Stand", "Prozone Mall", "Saravanampatti CHIL IT SEZ"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_METTUPALAYAM_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9580, 11.0120],
+          [76.9535, 11.0210],
+          [76.9490, 11.0310],
+          [76.9430, 11.0540],
+          [76.9380, 11.0780]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_METTUPALAYAM_1",
+        "road_name": "Mettupalayam Road (North CBE to Thudiyalur)",
+        "zone": "West Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3900,
+        "lane_count": 4,
+        "key_landmarks": ["Flower Market", "North Coimbatore Flyover", "Sai Baba Colony", "Thudiyalur"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_POLLACHI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9550, 10.9880],
+          [76.9585, 10.9730],
+          [76.9620, 10.9580],
+          [76.9655, 10.9430],
+          [76.9690, 10.9280]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_POLLACHI_1",
+        "road_name": "Pollachi Road (Ukkadam to Eachanari)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 55.0,
+        "road_capacity": 3700,
+        "lane_count": 4,
+        "key_landmarks": ["Ukkadam Bus Terminal", "Kurichi Lake Bypass", "Sundarapuram", "Eachanari Vinayagar Temple"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_100FT_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9670, 11.0180],
+          [76.9615, 11.0210],
+          [76.9560, 11.0240],
+          [76.9480, 11.0280]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_100FT_1",
+        "road_name": "100 Feet Road (Gandhipuram to Sivananda Colony)",
+        "zone": "Central Zone",
+        "road_type": "Commercial Arterial",
+        "speed_limit": 40.0,
+        "road_capacity": 3200,
+        "lane_count": 3,
+        "key_landmarks": ["Gandhipuram Central", "Power House", "Tatabad", "Sivananda Colony Flyover"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_CROSSCUT_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9670, 11.0180],
+          [76.9640, 11.0195],
+          [76.9610, 11.0210],
+          [76.9550, 11.0235]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_CROSSCUT_1",
+        "road_name": "Cross Cut Road (Commercial Retail Hub)",
+        "zone": "Central Zone",
+        "road_type": "Commercial Corridor",
+        "speed_limit": 30.0,
+        "road_capacity": 2600,
+        "lane_count": 2,
+        "key_landmarks": ["Gandhipuram Bus Stand", "Cross Cut Shopping Hub", "North Coimbatore Rly Station East"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_CBE_THADAGAM_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.9450, 11.0080],
+          [76.9385, 11.0135],
+          [76.9320, 11.0190],
+          [76.9220, 11.0305],
+          [76.9120, 11.0420]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_CBE_THADAGAM_1",
+        "road_name": "Thadagam Road (RS Puram to Lawley Road / TNAU)",
+        "zone": "West Zone",
+        "road_type": "Arterial",
+        "speed_limit": 45.0,
+        "road_capacity": 3000,
+        "lane_count": 3,
+        "key_landmarks": ["RS Puram Post Office", "Lawley Road Junction", "TNAU Botanical Garden", "GCT College"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_CBE_GANDHIPURAM",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [76.9675, 11.0180]
+      },
+      "properties": {
+        "junction_id": "JUNC_CBE_GANDHIPURAM",
+        "junction_name": "Gandhipuram Two-Tier Flyover Junction",
+        "zone": "Central Zone",
+        "junction_type": "Grade-Separated Flyover Hub",
+        "accident_risk_level": "High",
+        "connecting_roads": ["ROAD_CBE_SATHY_1", "ROAD_CBE_100FT_1", "ROAD_CBE_CROSSCUT_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_CBE_UKKADAM",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [76.9550, 10.9880]
+      },
+      "properties": {
+        "junction_id": "JUNC_CBE_UKKADAM",
+        "junction_name": "Ukkadam Bus Stand Flyover Junction",
+        "zone": "South Zone",
+        "junction_type": "Transit Interchange Roundabout",
+        "accident_risk_level": "High",
+        "connecting_roads": ["ROAD_CBE_POLLACHI_1", "ROAD_CBE_TRICHY_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_CBE_PEELAMEDU",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0260, 11.0310]
+      },
+      "properties": {
+        "junction_id": "JUNC_CBE_PEELAMEDU",
+        "junction_name": "Hope College / Peelamedu Junction",
+        "zone": "East Zone",
+        "junction_type": "Signalized Four-Way",
+        "accident_risk_level": "Medium",
+        "connecting_roads": ["ROAD_CBE_AVINASHI_2"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_CBE_LAKSHMI",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [76.9820, 11.0090]
+      },
+      "properties": {
+        "junction_id": "JUNC_CBE_LAKSHMI",
+        "junction_name": "Lakshmi Mills Junction",
+        "zone": "Central Zone",
+        "junction_type": "Signalized High-Volume Arterial Cross",
+        "accident_risk_level": "Medium",
+        "connecting_roads": ["ROAD_CBE_AVINASHI_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_CBE_SINGANALLUR",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0280, 11.0035]
+      },
+      "properties": {
+        "junction_id": "JUNC_CBE_SINGANALLUR",
+        "junction_name": "Singanallur Bus Terminal Signal",
+        "zone": "South Zone",
+        "junction_type": "Interstate Transit Crossroad",
+        "accident_risk_level": "High",
+        "connecting_roads": ["ROAD_CBE_TRICHY_2"]
+      }
+    }
+  ]
+}

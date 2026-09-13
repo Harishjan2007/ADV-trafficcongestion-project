@@ -1,0 +1,149 @@
+{
+  "city_id": "coimbatore",
+  "city_name": "Coimbatore",
+  "model_name": "Coimbatore HistGradientBoostingRegressor v1.0",
+  "model_family": "GradientBoostingRegressor (HistGradientBoosting)",
+  "model_version": "1.0.0",
+  "training_date": "2026-09-13",
+  "target": "congestion_index",
+  "forecast_horizon_minutes": 30,
+  "data_source": "Calibrated Coimbatore Multi-Day Benchmark Dataset",
+  "data_classification": "SIMULATED BENCHMARK DATA",
+  "metric_type": "Held-out test benchmark metrics",
+  "total_rows": 3330,
+  "unique_corridors": 10,
+  "metrics": {
+    "validation": {
+      "mae": 2.02,
+      "rmse": 3.25,
+      "r2": 0.981
+    },
+    "test": {
+      "mae": 2.45,
+      "rmse": 3.95,
+      "r2": 0.762
+    },
+    "baseline_persistence_test": {
+      "mae": 5.38,
+      "rmse": 7.65,
+      "r2": 0.075
+    },
+    "baseline_historical_test": {
+      "mae": 3.98,
+      "rmse": 5.12,
+      "r2": 0.588
+    },
+    "horizons": {
+      "15min": {
+        "mae": 2.45,
+        "rmse": 3.95,
+        "r2": 0.762
+      },
+      "30min": {
+        "mae": 2.45,
+        "rmse": 3.95,
+        "r2": 0.762
+      },
+      "45min": {
+        "mae": 3.58,
+        "rmse": 5.75,
+        "r2": 0.478
+      },
+      "60min": {
+        "mae": 3.58,
+        "rmse": 5.75,
+        "r2": 0.478
+      }
+    }
+  },
+  "feature_stats": {
+    "means": {
+      "hour_sin": -0.0022787358711787564,
+      "hour_cos": -0.008504358048268846,
+      "day_of_week_sin": -2.347138166174505e-17,
+      "day_of_week_cos": -0.009009009009009021,
+      "is_weekend": 0.2882882882882883,
+      "is_peak_hour": 0.24024024024024024,
+      "hour": 11.594594594594595,
+      "road_capacity": 3770.0,
+      "speed_limit": 48.5,
+      "lane_count": 3.6,
+      "vehicle_count_lag_1": 2012.1711711711712,
+      "vehicle_count_lag_2": 2010.365165165165,
+      "vehicle_count_lag_3": 2007.7642642642643,
+      "speed_lag_1": 30.44627627627628,
+      "speed_lag_2": 30.448888888888884,
+      "speed_lag_3": 30.458438438438435,
+      "congestion_lag_1": 40.2536036036036,
+      "congestion_lag_2": 40.233003003003,
+      "rolling_speed_mean_3h": 30.4512012012012,
+      "rolling_vol_mean_3h": 2010.1002002002,
+      "rolling_ci_mean_3h": 40.2276976976977,
+      "rolling_ci_std_3h": 7.2257438422913856,
+      "neighbor_congestion_lag_1": 40.2536036036036,
+      "rainfall": 0.5321321321321322,
+      "temperature": 25.833033033033033,
+      "is_raining": 0.05405405405405406,
+      "accident_lag_1": 0.0015015015015015015
+    },
+    "stds": {
+      "hour_sin": 0.7097173091574815,
+      "hour_cos": 0.7046447271935313,
+      "day_of_week_sin": 0.7103914786008694,
+      "day_of_week_cos": 0.7039624642090221,
+      "is_weekend": 0.4530339774156834,
+      "is_peak_hour": 0.42729345413553144,
+      "hour": 6.881451263632744,
+      "road_capacity": 643.6026660209092,
+      "speed_limit": 8.078960358896733,
+      "lane_count": 0.6634245788508069,
+      "vehicle_count_lag_1": 1122.2498200427083,
+      "vehicle_count_lag_2": 1124.2164019715012,
+      "vehicle_count_lag_3": 1126.7545287606977,
+      "speed_lag_1": 10.272086357372638,
+      "speed_lag_2": 10.275099475755665,
+      "speed_lag_3": 10.283730452008959,
+      "congestion_lag_1": 19.80489592500823,
+      "congestion_lag_2": 19.827392466752425,
+      "rolling_speed_mean_3h": 9.280001221697244,
+      "rolling_vol_mean_3h": 1050.2601024369608,
+      "rolling_ci_mean_3h": 17.92308773996302,
+      "rolling_ci_std_3h": 7.477073753893321,
+      "neighbor_congestion_lag_1": 19.80489592500823,
+      "rainfall": 2.356042184207331,
+      "temperature": 3.9215331005010956,
+      "is_raining": 0.22615829174691943,
+      "accident_lag_1": 0.0458309760929032
+    },
+    "importances": [
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037,
+      0.037
+    ]
+  },
+  "residual_std": 3.95
+}

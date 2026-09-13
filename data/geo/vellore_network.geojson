@@ -1,0 +1,277 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "city": "Vellore",
+    "city_id": "vellore",
+    "crs": "EPSG:4326 (WGS84)",
+    "description": "Vellore City Arterial Road Network, Transit Corridors and Critical Junctions",
+    "data_classification": "BENCHMARK_GEOMETRY",
+    "updated_at": "2026-09-13"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_NH48_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1120, 12.9340],
+          [79.1215, 12.9315],
+          [79.1290, 12.9295],
+          [79.1355, 12.9280]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_NH48_1",
+        "road_name": "Bangalore Road (NH48 to Green Circle)",
+        "zone": "West Zone",
+        "road_type": "National Highway Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3200,
+        "lane_count": 3,
+        "key_landmarks": ["Konavattam", "Old Tollgate", "Green Circle"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_KATPADI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1378, 12.9698],
+          [79.1390, 12.9510],
+          [79.1375, 12.9390],
+          [79.1355, 12.9280]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_KATPADI_1",
+        "road_name": "Katpadi Road (Station to Green Circle)",
+        "zone": "North Zone",
+        "road_type": "Arterial",
+        "speed_limit": 45.0,
+        "road_capacity": 3000,
+        "lane_count": 3,
+        "key_landmarks": ["Katpadi Railway Station", "VIT University Link", "Chittoor Bus Stand", "Palar Bridge"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_ARNI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1325, 12.9160],
+          [79.1335, 12.9015],
+          [79.1360, 12.8850],
+          [79.1390, 12.8650]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_ARNI_1",
+        "road_name": "Arni Road (Old Bus Stand to CMC Campus)",
+        "zone": "South Zone",
+        "road_type": "Arterial",
+        "speed_limit": 40.0,
+        "road_capacity": 2800,
+        "lane_count": 2,
+        "key_landmarks": ["Old Bus Stand", "Ida Scudder Hospital Road", "Bagayam CMC Campus", "Adukkamparai"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_FORT_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1280, 12.9200],
+          [79.1340, 12.9240],
+          [79.1330, 12.9140],
+          [79.1265, 12.9170]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_FORT_1",
+        "road_name": "Fort Round Road (Historic Perimeter)",
+        "zone": "Central Zone",
+        "road_type": "Sub-Arterial",
+        "speed_limit": 35.0,
+        "road_capacity": 2400,
+        "lane_count": 2,
+        "key_landmarks": ["Vellore Fort", "Jalakandeswarar Temple", "District Court", "Periyar Park"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_GANDHI_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1430, 12.9620],
+          [79.1480, 12.9550],
+          [79.1460, 12.9420],
+          [79.1390, 12.9350]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_GANDHI_1",
+        "road_name": "Gandhi Nagar Main Road",
+        "zone": "North Zone",
+        "road_type": "Collector Road",
+        "speed_limit": 40.0,
+        "road_capacity": 2200,
+        "lane_count": 2,
+        "key_landmarks": ["Gandhi Nagar Commercial Spine", "Auxilium College", "Silpadi Junction"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_RANIPET_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1355, 12.9280],
+          [79.1480, 12.9295],
+          [79.1580, 12.9310],
+          [79.1820, 12.9350]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_RANIPET_1",
+        "road_name": "Ranipet Road (Green Circle to Sathuvachari)",
+        "zone": "East Zone",
+        "road_type": "Arterial",
+        "speed_limit": 50.0,
+        "road_capacity": 3000,
+        "lane_count": 3,
+        "key_landmarks": ["Green Circle", "District Collectorate", "Sathuvachari Phase 1 & 2", "Palavansathu"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_BYPASS_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1080, 12.9180],
+          [79.1240, 12.9120],
+          [79.1420, 12.9140],
+          [79.1650, 12.9220]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_BYPASS_1",
+        "road_name": "Vellore Southern Bypass Corridor",
+        "zone": "South Zone",
+        "road_type": "Highway Bypass",
+        "speed_limit": 60.0,
+        "road_capacity": 3500,
+        "lane_count": 4,
+        "key_landmarks": ["Konavattam Bypass", "Otteri Lake", "Sathuvachari South Link"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ROAD_VEL_CHITTOOR_1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [79.1378, 12.9698],
+          [79.1350, 12.9850],
+          [79.1310, 13.0020],
+          [79.1250, 13.0210]
+        ]
+      },
+      "properties": {
+        "road_id": "ROAD_VEL_CHITTOOR_1",
+        "road_name": "Chittoor Radial Highway (Katpadi North)",
+        "zone": "North Zone",
+        "road_type": "Interstate Arterial",
+        "speed_limit": 55.0,
+        "road_capacity": 2800,
+        "lane_count": 2,
+        "key_landmarks": ["Katpadi North Extension", "Brahmapuram", "Andhra Interstate Checkpost"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VEL_GREENCIRCLE",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1355, 12.9280]
+      },
+      "properties": {
+        "junction_id": "JUNC_VEL_GREENCIRCLE",
+        "junction_name": "Green Circle Roundabout",
+        "zone": "Central Zone",
+        "junction_type": "Multi-Leg Rotary",
+        "accident_risk_level": "High",
+        "connecting_roads": ["ROAD_VEL_NH48_1", "ROAD_VEL_KATPADI_1", "ROAD_VEL_RANIPET_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VEL_KATPADI_STN",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1378, 12.9698]
+      },
+      "properties": {
+        "junction_id": "JUNC_VEL_KATPADI_STN",
+        "junction_name": "Katpadi Railway Station Junction",
+        "zone": "North Zone",
+        "junction_type": "Signalized T-Junction",
+        "accident_risk_level": "Medium",
+        "connecting_roads": ["ROAD_VEL_KATPADI_1", "ROAD_VEL_CHITTOOR_1", "ROAD_VEL_GANDHI_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VEL_CMC",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1335, 12.9015]
+      },
+      "properties": {
+        "junction_id": "JUNC_VEL_CMC",
+        "junction_name": "CMC Hospital Roundabout",
+        "zone": "South Zone",
+        "junction_type": "Hospital Access Rotary",
+        "accident_risk_level": "Medium",
+        "connecting_roads": ["ROAD_VEL_ARNI_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VEL_OLD_BUSSTAND",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1315, 12.9185]
+      },
+      "properties": {
+        "junction_id": "JUNC_VEL_OLD_BUSSTAND",
+        "junction_name": "Old Bus Stand / Fort Junction",
+        "zone": "Central Zone",
+        "junction_type": "Signalized Urban Intersection",
+        "accident_risk_level": "High",
+        "connecting_roads": ["ROAD_VEL_FORT_1", "ROAD_VEL_ARNI_1"]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "JUNC_VEL_COLLECTORATE",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1580, 12.9310]
+      },
+      "properties": {
+        "junction_id": "JUNC_VEL_COLLECTORATE",
+        "junction_name": "Sathuvachari Collectorate Junction",
+        "zone": "East Zone",
+        "junction_type": "Administrative Four-Way",
+        "accident_risk_level": "Low",
+        "connecting_roads": ["ROAD_VEL_RANIPET_1"]
+      }
+    }
+  ]
+}

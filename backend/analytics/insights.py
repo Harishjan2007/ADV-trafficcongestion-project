@@ -117,3 +117,88 @@ def generate_live_insights(
         ))
 
     return insights
+
+
+def generate_city_comparison_insights(
+    city_slice_map: Dict[str, List[Dict[str, Any]]],
+    hour: int = 8
+) -> List[AutomatedInsight]:
+    """
+    Computes purely data-driven, evidence-based comparative insights across Chennai, Vellore, and Coimbatore.
+    Statements are calculated strictly from active observations—no hardcoded conclusions.
+    """
+    insights: List[AutomatedInsight] = []
+    ts = f"2026-08-30T{hour:02d}:00:00+05:30"
+
+    city_stats = {}
+    for cid, recs in city_slice_map.items():
+        if recs:
+            avg_ci = round(sum(r["congestion_index"] for r in recs) / len(recs), 1)
+            avg_spd = round(sum(r["average_speed"] for r in recs) / len(recs), 1)
+            total_vol = sum(r["vehicle_count"] for r in recs)
+            severe_cnt = sum(1 for r in recs if r["congestion_level"] == "Severe")
+            acc_cnt = sum(r["accident_count"] for r in recs)
+            c_name = recs[0].get("city_name", cid.capitalize())
+            city_stats[cid] = {
+                "city_name": c_name,
+                "avg_ci": avg_ci,
+                "avg_spd": avg_spd,
+                "total_vol": total_vol,
+                "severe_cnt": severe_cnt,
+                "acc_cnt": acc_cnt
+            }
+
+    if not city_stats:
+        return insights
+
+    # Insight 1: Congestion Leader
+    sorted_by_ci = sorted(city_stats.items(), key=lambda x: x[1]["avg_ci"], reverse=True)
+    highest_city = sorted_by_ci[0][1]
+    lowest_city = sorted_by_ci[-1][1]
+    ci_diff_pct = round(((highest_city["avg_ci"] - lowest_city["avg_ci"]) / max(1.0, lowest_city["avg_ci"])) * 100, 1)
+
+    insights.append(AutomatedInsight(
+        insight_id=f"CMP_CONGESTION_LEADER_{hour}",
+        category="BOTTLENECK",
+        title=f"{highest_city['city_name']} Currently Exhibits Highest Congestion Index",
+        description=f"{highest_city['city_name']} averages a Congestion Index of {highest_city['avg_ci']}/100 at {hour:02d}:00, which is {ci_diff_pct}% higher than {lowest_city['city_name']} ({lowest_city['avg_ci']}/100).",
+        severity="CRITICAL" if highest_city["avg_ci"] >= 65 else "WARNING",
+        affected_locations=[highest_city['city_name']],
+        supporting_metric=f"CI Delta: +{round(highest_city['avg_ci'] - lowest_city['avg_ci'], 1)} pts ({ci_diff_pct}%)",
+        timestamp=ts
+    ))
+
+    # Insight 2: Velocity Leader
+    sorted_by_spd = sorted(city_stats.items(), key=lambda x: x[1]["avg_spd"], reverse=True)
+    fastest_city = sorted_by_spd[0][1]
+    slowest_city = sorted_by_spd[-1][1]
+    spd_diff = round(fastest_city["avg_spd"] - slowest_city["avg_spd"], 1)
+
+    insights.append(AutomatedInsight(
+        insight_id=f"CMP_SPEED_LEADER_{hour}",
+        category="TEMPORAL_SPIKE",
+        title=f"{fastest_city['city_name']} Maintains Highest Average Network Velocity",
+        description=f"Average arterial speed in {fastest_city['city_name']} is {fastest_city['avg_spd']} km/h (+{spd_diff} km/h faster than {slowest_city['city_name']} at {slowest_city['avg_spd']} km/h).",
+        severity="INFO",
+        affected_locations=[fastest_city['city_name']],
+        supporting_metric=f"Speed Advantage: +{spd_diff} km/h",
+        timestamp=ts
+    ))
+
+    # Insight 3: Critical Gridlock and Accident Hotspots
+    incident_cities = [s for s in city_stats.values() if s["acc_cnt"] > 0]
+    if incident_cities:
+        top_inc_city = max(incident_cities, key=lambda x: x["acc_cnt"])
+        insights.append(AutomatedInsight(
+            insight_id=f"CMP_ACCIDENT_HOTSPOT_{hour}",
+            category="ACCIDENT_RISK",
+            title=f"Incident Clustering Observed in {top_inc_city['city_name']}",
+            description=f"{top_inc_city['city_name']} reports {top_inc_city['acc_cnt']} active collision(s) during hour {hour:02d}:00, compounding speed degradation across bottlenecks.",
+            severity="WARNING",
+            affected_locations=[top_inc_city['city_name']],
+            supporting_metric=f"{top_inc_city['acc_cnt']} incidents logged",
+            timestamp=ts
+        ))
+
+    return insights
+

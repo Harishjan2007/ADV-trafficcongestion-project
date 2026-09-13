@@ -36,6 +36,13 @@ app.include_router(analytics_router)
 app.include_router(insights_router)
 app.include_router(ml_router)
 
+# Preload Multi-City ML Engines
+try:
+    from backend.services.ml_engine import MultiCityMLEngine
+    MultiCityMLEngine.get_instance()
+except Exception as e:
+    logger.warning(f"Could not initialize MultiCityMLEngine at startup: {e}")
+
 
 import os
 try:

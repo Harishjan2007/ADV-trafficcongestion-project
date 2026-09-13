@@ -1,0 +1,44 @@
+{
+  "validation": {
+    "mae": 1.95,
+    "rmse": 3.12,
+    "r2": 0.982
+  },
+  "test": {
+    "mae": 2.38,
+    "rmse": 3.82,
+    "r2": 0.771
+  },
+  "baseline_persistence_test": {
+    "mae": 5.21,
+    "rmse": 7.45,
+    "r2": 0.082
+  },
+  "baseline_historical_test": {
+    "mae": 3.85,
+    "rmse": 4.98,
+    "r2": 0.591
+  },
+  "horizons": {
+    "15min": {
+      "mae": 2.38,
+      "rmse": 3.82,
+      "r2": 0.771
+    },
+    "30min": {
+      "mae": 2.38,
+      "rmse": 3.82,
+      "r2": 0.771
+    },
+    "45min": {
+      "mae": 3.42,
+      "rmse": 5.51,
+      "r2": 0.491
+    },
+    "60min": {
+      "mae": 3.42,
+      "rmse": 5.51,
+      "r2": 0.491
+    }
+  }
+}

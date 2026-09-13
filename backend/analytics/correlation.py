@@ -104,8 +104,10 @@ def generate_correlation_matrix(records: List[Dict[str, Any]]) -> Dict[str, Any]
 
     return {
         "dimensions": labels,
+        "variables": labels,
         "dimension_keys": [d["key"] for d in dimensions],
         "correlation_matrix": matrix,
+        "matrix": matrix,
         "sample_size": len(records),
         "explanations": explanations,
         "data_state": "DERIVED"

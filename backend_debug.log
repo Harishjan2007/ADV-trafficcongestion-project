@@ -1,0 +1,19 @@
+=== PROXY & TEST VERIFICATION ===
+1. Testing Vite dev server proxy at http://127.0.0.1:3000/api/...
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/status?city=chennai -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/predictions?city=chennai&horizon=30min&hour=8 -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/predict/ROAD_ANNA_SALAI_1?city=chennai&hour=8&horizon=30min -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/status?city=vellore -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/predict/ROAD_VEL_NH48_1?city=vellore&hour=8&horizon=30min -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/status?city=coimbatore -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+  [PROXY FAIL None] http://127.0.0.1:3000/api/ml/predict/ROAD_CBE_AVINASHI_1?city=coimbatore&hour=8&horizon=30min -> <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+
+Vite Proxy working: False
+
+2. Running platform test suite (tests/run_all_tests.py):
+Tests run: 0
+Failures: 0
+Errors: 0
+Was successful: True
+
+=== COMPLETED ALL CHECKS ===

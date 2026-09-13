@@ -1,0 +1,21 @@
+=== FRONTEND (PORT 3000, localhost) PROXY & API VERIFICATION ===
+Server address: {"address":"::1","family":"IPv6","port":3000}
+[PASS 200] http://localhost:3000/api/ml/status?city=chennai -> CI=undefined, Speed=undefined, Vol=undefined, Conf=undefined, Level=undefined
+[PASS 200] http://localhost:3000/api/ml/predictions?city=chennai&horizon=30min&hour=8 -> array of 14 items; item 0 CI=78.7
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_ANNA_SALAI_1?city=chennai&hour=8&horizon=15min -> CI=78.7, Speed=16.6, Vol=3783, Conf=0.92, Level=Severe
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_ANNA_SALAI_1?city=chennai&hour=8&horizon=30min -> CI=78.7, Speed=16.6, Vol=3783, Conf=0.92, Level=Severe
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_ANNA_SALAI_1?city=chennai&hour=8&horizon=45min -> CI=73.8, Speed=18.6, Vol=3639, Conf=0.92, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_ANNA_SALAI_1?city=chennai&hour=8&horizon=60min -> CI=73.8, Speed=18.6, Vol=3639, Conf=0.92, Level=High
+[PASS 200] http://localhost:3000/api/ml/status?city=vellore -> CI=undefined, Speed=undefined, Vol=undefined, Conf=undefined, Level=undefined
+[PASS 200] http://localhost:3000/api/ml/predictions?city=vellore&horizon=30min&hour=8 -> array of 8 items; item 0 CI=71.3
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_VEL_NH48_1?city=vellore&hour=8&horizon=15min -> CI=71.3, Speed=19.7, Vol=2717, Conf=0.93, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_VEL_NH48_1?city=vellore&hour=8&horizon=30min -> CI=71.3, Speed=19.7, Vol=2717, Conf=0.93, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_VEL_NH48_1?city=vellore&hour=8&horizon=45min -> CI=73.9, Speed=18.6, Vol=2775, Conf=0.93, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_VEL_NH48_1?city=vellore&hour=8&horizon=60min -> CI=73.9, Speed=18.6, Vol=2775, Conf=0.93, Level=High
+[PASS 200] http://localhost:3000/api/ml/status?city=coimbatore -> CI=undefined, Speed=undefined, Vol=undefined, Conf=undefined, Level=undefined
+[PASS 200] http://localhost:3000/api/ml/predictions?city=coimbatore&horizon=30min&hour=8 -> array of 10 items; item 0 CI=73.7
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_CBE_AVINASHI_1?city=coimbatore&hour=8&horizon=15min -> CI=73.7, Speed=20.5, Vol=3896, Conf=0.92, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_CBE_AVINASHI_1?city=coimbatore&hour=8&horizon=30min -> CI=73.7, Speed=20.5, Vol=3896, Conf=0.92, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_CBE_AVINASHI_1?city=coimbatore&hour=8&horizon=45min -> CI=74, Speed=20.4, Vol=3906, Conf=0.92, Level=High
+[PASS 200] http://localhost:3000/api/ml/predict/ROAD_CBE_AVINASHI_1?city=coimbatore&hour=8&horizon=60min -> CI=74, Speed=20.4, Vol=3906, Conf=0.92, Level=High
+=== VERIFICATION COMPLETE ===

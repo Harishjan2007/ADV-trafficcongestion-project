@@ -11,10 +11,12 @@ class CanonicalTrafficRecord(BaseModel):
     # Identity
     record_id: str = Field(..., description="Unique record identifier")
     timestamp: str = Field(..., description="ISO 8601 Timestamp string")
+    city_id: Optional[str] = Field("chennai", description="Standardized city identifier (chennai, vellore, coimbatore)")
+    city_name: Optional[str] = Field("Chennai", description="Display city name")
 
-    # Geography
-    latitude: float = Field(..., ge=12.80, le=13.35, description="WGS84 Latitude")
-    longitude: float = Field(..., ge=80.00, le=80.40, description="WGS84 Longitude")
+    # Geography (Tamil Nadu Extent: 8.0 - 14.5 N, 76.0 - 81.0 E)
+    latitude: float = Field(..., ge=8.0, le=14.5, description="WGS84 Latitude")
+    longitude: float = Field(..., ge=76.0, le=81.0, description="WGS84 Longitude")
     road_id: str = Field(..., description="Standardized Road ID")
     road_name: str = Field(..., description="Recognized road name")
     junction: Optional[str] = Field(None, description="Major intersection or landmark")
@@ -73,6 +75,8 @@ class FilterQuery(BaseModel):
 
 class CityOverviewSummary(BaseModel):
     timestamp: str
+    city_id: Optional[str] = "chennai"
+    city_name: Optional[str] = "Chennai"
     total_monitored_roads: int
     average_city_speed: float
     average_congestion_index: float
@@ -91,6 +95,8 @@ class FeatureContribution(BaseModel):
 
 class MLPredictionPayload(BaseModel):
     location_id: str
+    city_id: Optional[str] = "chennai"
+    city_name: Optional[str] = "Chennai"
     prediction_timestamp: str
     prediction_horizon: str  # 15min, 30min, 45min, 60min
     predicted_congestion_level: str  # Low, Moderate, High, Severe

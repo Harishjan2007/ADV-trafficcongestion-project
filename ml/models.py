@@ -9,7 +9,7 @@ from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegresso
 from ml.config import RANDOM_SEED
 
 
-def build_random_forest_model(params: Dict[str, Any] = None) -> RandomForestRegressor:
+def build_random_forest_model(params: Dict[str, Any] = None, **kwargs) -> RandomForestRegressor:
     """Builds a tuned Random Forest regressor candidate."""
     default_params = {
         "n_estimators": 100,
@@ -21,10 +21,11 @@ def build_random_forest_model(params: Dict[str, Any] = None) -> RandomForestRegr
     }
     if params:
         default_params.update(params)
+    default_params.update(kwargs)
     return RandomForestRegressor(**default_params)
 
 
-def build_gradient_boosting_model(params: Dict[str, Any] = None) -> HistGradientBoostingRegressor:
+def build_gradient_boosting_model(params: Dict[str, Any] = None, **kwargs) -> HistGradientBoostingRegressor:
     """
     Builds a high-performance Gradient Boosted Decision Tree (LightGBM equivalent).
     Features native histogram binning, monotonic constraints, and early stopping.
@@ -39,7 +40,9 @@ def build_gradient_boosting_model(params: Dict[str, Any] = None) -> HistGradient
     }
     if params:
         default_params.update(params)
+    default_params.update(kwargs)
     return HistGradientBoostingRegressor(**default_params)
+
 
 
 class MultiHorizonTrafficModel:
