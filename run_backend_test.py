@@ -51,16 +51,17 @@ for u in vite_endpoints:
 
 log(f"\nVite Proxy working: {proxy_all_ok}")
 
-# Run full test suite with unittest TextTestRunner
+# Run full platform test suite
 log("\n2. Running platform test suite (tests/run_all_tests.py):")
-import unittest
-loader = unittest.TestLoader()
-suite = loader.discover(os.path.join(os.path.dirname(__file__), "tests"), pattern="test_*.py")
-runner = unittest.TextTestRunner(verbosity=1)
-result = runner.run(suite)
-log(f"Tests run: {result.testsRun}")
-log(f"Failures: {len(result.failures)}")
-log(f"Errors: {len(result.errors)}")
-log(f"Was successful: {result.wasSuccessful()}")
+try:
+    from tests.run_all_tests import run_all_tests
+    total, passed, failed, errors = run_all_tests()
+    log(f"Platform Tests Run: {total}")
+    log(f"Passed: {passed}")
+    log(f"Failures: {failed}")
+    log(f"Errors: {errors}")
+    log(f"Was successful: {failed == 0 and errors == 0}")
+except Exception as e:
+    log(f"Error running platform test suite: {e}")
 
 log("\n=== COMPLETED ALL CHECKS ===")

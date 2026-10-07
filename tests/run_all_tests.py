@@ -94,6 +94,7 @@ from tests.test_task2_multicity import (
     test_city_data_sufficiency,
     test_existing_chennai_functionality
 )
+from tests.test_api_verification import run_api_verification
 
 
 def run_all_tests():
@@ -183,6 +184,9 @@ def run_all_tests():
         ("test_city_temporal_leakage", test_city_temporal_leakage),
         ("test_city_data_sufficiency", test_city_data_sufficiency),
         ("test_existing_chennai_functionality", test_existing_chennai_functionality),
+        
+        # End-to-End API Verification Suite (Task 2)
+        ("test_api_verification_suite", run_api_verification),
     ]
 
     print("=" * 80)

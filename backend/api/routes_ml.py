@@ -40,7 +40,10 @@ def get_all_predictions(
     target_city = str(_clean_param(city, "chennai")).lower().strip()
     target_horizon = str(_clean_param(horizon, "30min")).strip()
     target_hour = int(_clean_param(hour, 8))
-    return adapter.get_all_predictions(horizon=target_horizon, hour=target_hour, city=target_city)
+    try:
+        return adapter.get_all_predictions(horizon=target_horizon, hour=target_hour, city=target_city)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 
 @router.get("/predict/{location_id}", response_model=MLPredictionPayload)
@@ -54,7 +57,10 @@ def get_prediction_for_location(
     target_city = str(_clean_param(city, "chennai")).lower().strip()
     target_horizon = str(_clean_param(horizon, "30min")).strip()
     target_hour = int(_clean_param(hour, 8))
-    return adapter.get_prediction(location_id, horizon=target_horizon, hour=target_hour, city=target_city)
+    try:
+        return adapter.get_prediction(location_id, horizon=target_horizon, hour=target_hour, city=target_city)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 
 @router.post("/ingest")

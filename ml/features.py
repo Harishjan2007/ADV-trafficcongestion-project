@@ -77,9 +77,10 @@ class FeatureEngineer:
         is_evening = (hour >= 17) & (hour <= 20)
         data["is_peak_hour"] = ((is_morning | is_evening) & (data["is_weekend"] == 0)).astype(int)
 
-        # Cyclical transformations
-        data["hour_sin"] = np.sin(2 * np.pi * hour / 24.0)
-        data["hour_cos"] = np.cos(2 * np.pi * hour / 24.0)
+        # Cyclical transformations with exact sub-hour resolution
+        time_fraction = hour + data["minute"] / 60.0
+        data["hour_sin"] = np.sin(2 * np.pi * time_fraction / 24.0)
+        data["hour_cos"] = np.cos(2 * np.pi * time_fraction / 24.0)
         data["day_of_week_sin"] = np.sin(2 * np.pi * day_of_week / 7.0)
         data["day_of_week_cos"] = np.cos(2 * np.pi * day_of_week / 7.0)
 

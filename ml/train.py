@@ -50,9 +50,18 @@ def run_training_pipeline(dataset_path: str = None, force_benchmark: bool = True
     # 1. Dataset Resolution
     if dataset_path is None:
         dataset_path = BENCHMARK_DATASET_PATH
-        if not os.path.exists(dataset_path) and force_benchmark:
-            print("[INFO] Generating calibrated 14-day development benchmark dataset...")
-            data = generate_multiday_benchmark(num_days=14, seed=RANDOM_SEED)
+        need_regen = not os.path.exists(dataset_path)
+        if not need_regen and force_benchmark:
+            try:
+                with open(dataset_path, "r", encoding="utf-8") as f_chk:
+                    m_chk = json.load(f_chk).get("metadata", {})
+                    if m_chk.get("sampling_frequency") != "15 minutes":
+                        need_regen = True
+            except Exception:
+                need_regen = True
+        if need_regen and force_benchmark:
+            print("[INFO] Generating calibrated 15-minute 14-day development benchmark dataset...")
+            data = generate_multiday_benchmark(interval_minutes=15, num_days=14, seed=RANDOM_SEED)
             with open(dataset_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
 
@@ -84,10 +93,10 @@ def run_training_pipeline(dataset_path: str = None, force_benchmark: bool = True
     df_features = engineer.build_features(df_clean)
     print(f"  Feature matrix created: {len(df_features)} rows x {len(FEATURE_COLUMNS)} features")
 
-    # 4. Target Construction (+30m lead)
-    print("\n[STEP 4] Constructing Supervised Forecasting Targets (+30m / step 1)...")
-    target_builder = TargetBuilder(primary_lead_steps=1)
-    df_supervised = target_builder.attach_targets(df_features)
+    # 4. Target Construction (+30m lead = 2 steps for 15-min intervals)
+    print("\n[STEP 4] Constructing Supervised Forecasting Targets (+30m / step 2)...")
+    target_builder = TargetBuilder(primary_lead_steps=2)
+    df_supervised = target_builder.attach_targets(df_features, lead_steps=2)
     print(f"  Supervised dataset ready: {len(df_supervised)} rows")
 
     # 5. Chronological Split
@@ -179,10 +188,10 @@ def run_training_pipeline(dataset_path: str = None, force_benchmark: bool = True
     horizon_metrics = {}
 
     horizon_step_map = {
-        "15min": 1,
-        "30min": 1,  # Primary
-        "45min": 2,
-        "60min": 2
+        "15min": 1,  # shift(-1) = +15m
+        "30min": 2,  # shift(-2) = +30m (primary)
+        "45min": 3,  # shift(-3) = +45m
+        "60min": 4   # shift(-4) = +60m
     }
 
     for h_name, lead_step in horizon_step_map.items():
@@ -218,6 +227,7 @@ def run_training_pipeline(dataset_path: str = None, force_benchmark: bool = True
     print("\n[STEP 12] Exporting Model Artifacts, Schema & Metadata...")
     primary_artifact_path = os.path.join(ARTIFACTS_DIR, "traffic_model_30m.joblib")
     joblib.dump(best_val_model, primary_artifact_path)
+    joblib.dump(best_val_model, os.path.join(ARTIFACTS_DIR, "traffic_model_30min.joblib"))
 
     metadata = {
         "model_name": selected_name,

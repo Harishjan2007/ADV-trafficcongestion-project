@@ -111,9 +111,16 @@ def load_corridor_specs(city_id: str = "chennai") -> List[Dict[str, Any]]:
     return specs
 
 
-def generate_multiday_benchmark(city_id: str = "chennai", num_days: int = 14, seed: Optional[int] = None, city: Optional[str] = None) -> Dict[str, Any]:
+def generate_multiday_benchmark(
+    city_id: str = "chennai",
+    num_days: int = 14,
+    seed: Optional[int] = None,
+    city: Optional[str] = None,
+    interval_minutes: int = 15
+) -> Dict[str, Any]:
     """
-    Generates 14 days of realistic, diurnal, weather-responsive corridor traffic data for any supported city.
+    Generates multi-day realistic, diurnal, weather-responsive corridor traffic data for any supported city.
+    Defaults to 15-minute sampling frequency strictly for development, ML training, and testing.
     Ensures zero future leakage in structure and consistent schemas.
     """
     target_c = city or city_id
@@ -131,6 +138,8 @@ def generate_multiday_benchmark(city_id: str = "chennai", num_days: int = 14, se
     m_peak_start, m_peak_end = c_meta["peak_morning"]
     e_peak_start, e_peak_end = c_meta["peak_evening"]
 
+    minutes_list = list(range(0, 60, interval_minutes))
+
     for day_idx in range(num_days):
         current_day = start_date + timedelta(days=day_idx)
         date_str = current_day.strftime("%Y-%m-%d")
@@ -139,137 +148,143 @@ def generate_multiday_benchmark(city_id: str = "chennai", num_days: int = 14, se
         day_name = current_day.strftime("%A")
 
         for hour in range(24):
-            is_morning_peak = (m_peak_start <= hour <= m_peak_end)
-            is_evening_peak = (e_peak_start <= hour <= e_peak_end)
-            is_peak_hour = (is_morning_peak or is_evening_peak) and not is_weekend
+            for minute in minutes_list:
+                time_val = hour + (minute / 60.0)
+                is_morning_peak = (m_peak_start <= time_val <= m_peak_end)
+                is_evening_peak = (e_peak_start <= time_val <= e_peak_end)
+                is_peak_hour = (is_morning_peak or is_evening_peak) and not is_weekend
 
-            # Weather lookup
-            rain_mm = 0.0
-            weather_cond = "Clear"
-            if day_idx in rain_schedule:
-                for r_start, r_end, r_amount, r_cond in rain_schedule[day_idx]:
-                    if r_start <= hour <= r_end:
-                        rain_mm = round(r_amount * (0.8 + 0.4 * math.sin((hour - r_start) * math.pi / max(1, r_end - r_start))), 1)
-                        weather_cond = r_cond
-                        break
+                # Weather lookup with continuous time_val
+                rain_mm = 0.0
+                weather_cond = "Clear"
+                if day_idx in rain_schedule:
+                    for r_start, r_end, r_amount, r_cond in rain_schedule[day_idx]:
+                        if r_start <= time_val <= r_end:
+                            rain_mm = round(r_amount * (0.8 + 0.4 * math.sin((time_val - r_start) * math.pi / max(1.0, r_end - r_start))), 1)
+                            weather_cond = r_cond
+                            break
 
-            # Diurnal temperature cycle
-            base_temp = 30.0 if city_key == "chennai" else (32.0 if city_key == "vellore" else 26.0)
-            temp_c = round(base_temp + 5.5 * math.sin((hour - 8) * math.pi / 12) - (rain_mm * 0.4), 1)
-            visibility_km = round(max(1.5, 10.0 - (rain_mm * 0.6)), 1)
+                # Diurnal temperature cycle
+                base_temp = 30.0 if city_key == "chennai" else (32.0 if city_key == "vellore" else 26.0)
+                temp_c = round(base_temp + 5.5 * math.sin((time_val - 8) * math.pi / 12) - (rain_mm * 0.4), 1)
+                visibility_km = round(max(1.5, 10.0 - (rain_mm * 0.6)), 1)
 
-            for c in corridor_specs:
-                cap = c["road_capacity"]
-                limit = c["speed_limit"]
-                rid = c["road_id"]
+                for c in corridor_specs:
+                    cap = c["road_capacity"]
+                    limit = c["speed_limit"]
+                    rid = c["road_id"]
 
-                # Base volume factor calibrated by city characteristics
-                if is_weekend:
-                    vol_factor = 0.35 + 0.30 * math.sin(max(0, hour - 7) * math.pi / 14)
-                elif is_morning_peak:
-                    vol_factor = 0.88 + 0.08 * random.uniform(-0.5, 0.5)
-                elif is_evening_peak:
-                    vol_factor = 0.92 + 0.08 * random.uniform(-0.5, 0.5)
-                elif 12 <= hour <= 16:
-                    vol_factor = 0.58 + 0.05 * random.uniform(-0.5, 0.5)
-                elif 0 <= hour <= 5:
-                    vol_factor = 0.12 + 0.04 * random.uniform(-0.5, 0.5)
-                else:
-                    vol_factor = 0.48 + 0.06 * random.uniform(-0.5, 0.5)
-
-                # City-specific arterial adjustments
-                if city_key == "chennai":
-                    if rid in ["ROAD_GST_1", "ROAD_ANNA_SALAI_1", "ROAD_OMR_1"]:
-                        vol_factor *= 1.05
-                elif city_key == "vellore":
-                    # Concentrated Green Circle bottleneck
-                    if rid in ["ROAD_VEL_NH48_1", "ROAD_VEL_KATPADI_1"]:
-                        vol_factor *= 1.08
+                    # Base volume factor calibrated by city characteristics
+                    if is_weekend:
+                        vol_factor = 0.35 + 0.30 * math.sin(max(0.0, time_val - 7) * math.pi / 14)
+                    elif is_morning_peak:
+                        vol_factor = 0.88 + 0.08 * random.uniform(-0.5, 0.5)
+                    elif is_evening_peak:
+                        vol_factor = 0.92 + 0.08 * random.uniform(-0.5, 0.5)
+                    elif 12 <= time_val <= 16:
+                        vol_factor = 0.58 + 0.05 * random.uniform(-0.5, 0.5)
+                    elif 0 <= time_val <= 5:
+                        vol_factor = 0.12 + 0.04 * random.uniform(-0.5, 0.5)
                     else:
-                        vol_factor *= 0.92
-                elif city_key == "coimbatore":
-                    # Avinashi Road and Sathy Road handle heavy commuters
-                    if rid in ["ROAD_CBE_AVINASHI_1", "ROAD_CBE_AVINASHI_2", "ROAD_CBE_SATHY_1"]:
-                        vol_factor *= 1.06
+                        vol_factor = 0.48 + 0.06 * random.uniform(-0.5, 0.5)
+
+                    # City-specific arterial adjustments
+                    if city_key == "chennai":
+                        if rid in ["ROAD_GST_1", "ROAD_ANNA_SALAI_1", "ROAD_OMR_1"]:
+                            vol_factor *= 1.05
+                    elif city_key == "vellore":
+                        # Concentrated Green Circle bottleneck
+                        if rid in ["ROAD_VEL_NH48_1", "ROAD_VEL_KATPADI_1"]:
+                            vol_factor *= 1.08
+                        else:
+                            vol_factor *= 0.92
+                    elif city_key == "coimbatore":
+                        # Avinashi Road and Sathy Road handle heavy commuters
+                        if rid in ["ROAD_CBE_AVINASHI_1", "ROAD_CBE_AVINASHI_2", "ROAD_CBE_SATHY_1"]:
+                            vol_factor *= 1.06
+                        else:
+                            vol_factor *= 0.95
+
+                    vol = int(cap * vol_factor)
+                    util = vol / cap
+
+                    # Greenshields speed degradation model
+                    rain_penalty = min(0.35, (rain_mm / 25.0) * 0.4)
+                    if util < 0.60:
+                        spd_factor = 0.85 - (util * 0.25)
+                    elif util < 0.85:
+                        spd_factor = 0.65 - ((util - 0.60) * 0.8)
                     else:
-                        vol_factor *= 0.95
+                        spd_factor = 0.35 - ((util - 0.85) * 0.6)
 
-                vol = int(cap * vol_factor)
-                util = vol / cap
+                    spd_factor = max(0.15, spd_factor - rain_penalty)
+                    avg_spd = round(limit * spd_factor * (1.0 + 0.04 * random.uniform(-1, 1)), 1)
+                    avg_spd = max(5.0, min(limit, avg_spd))
 
-                # Greenshields speed degradation model
-                rain_penalty = min(0.35, (rain_mm / 25.0) * 0.4)
-                if util < 0.60:
-                    spd_factor = 0.85 - (util * 0.25)
-                elif util < 0.85:
-                    spd_factor = 0.65 - ((util - 0.60) * 0.8)
-                else:
-                    spd_factor = 0.35 - ((util - 0.85) * 0.6)
+                    # Accident occurrences
+                    acc_count, acc_sev = 0, None
+                    if (day_idx, hour, rid) in incident_events and minute == 0:
+                        acc_count, acc_sev = incident_events[(day_idx, hour, rid)]
+                        avg_spd = max(5.0, round(avg_spd * 0.55, 1))
 
-                spd_factor = max(0.15, spd_factor - rain_penalty)
-                avg_spd = round(limit * spd_factor * (1.0 + 0.04 * random.uniform(-1, 1)), 1)
-                avg_spd = max(5.0, min(limit, avg_spd))
+                    # Congestion index (Canonical Formula)
+                    speed_deficit = max(0.0, (limit - avg_spd) / limit)
+                    util_score = min(1.0, util / 1.2)
+                    ci = round((0.45 * util_score * 100.0) + (0.55 * speed_deficit * 100.0), 1)
+                    ci = max(0.0, min(100.0, ci))
+                    level = get_congestion_level(ci)
 
-                # Accident occurrences
-                acc_count, acc_sev = 0, None
-                if (day_idx, hour, rid) in incident_events:
-                    acc_count, acc_sev = incident_events[(day_idx, hour, rid)]
-                    avg_spd = max(5.0, round(avg_spd * 0.55, 1))
+                    timestamp_iso = f"{date_str}T{hour:02d}:{minute:02d}:00+05:30"
+                    rec_id = f"REC_{city_key.upper()}_{rid}_{current_day.strftime('%Y%m%d')}_{hour:02d}{minute:02d}"
 
-                # Congestion index (Canonical Formula)
-                speed_deficit = max(0.0, (limit - avg_spd) / limit)
-                util_score = min(1.0, util / 1.2)
-                ci = round((0.45 * util_score * 100.0) + (0.55 * speed_deficit * 100.0), 1)
-                ci = max(0.0, min(100.0, ci))
-                level = get_congestion_level(ci)
+                    records.append({
+                        "record_id": rec_id,
+                        "city_id": city_key,
+                        "city_name": c_meta["city_name"],
+                        "timestamp": timestamp_iso,
+                        "date": date_str,
+                        "hour": hour,
+                        "minute": minute,
+                        "time": f"{hour:02d}:{minute:02d}",
+                        "day_of_week": day_name,
+                        "is_weekend": is_weekend,
+                        "is_peak_hour": is_peak_hour,
+                        "road_id": rid,
+                        "road_name": c["road_name"],
+                        "zone": c["zone"],
+                        "road_type": c["road_type"],
+                        "latitude": c["lat"],
+                        "longitude": c["lng"],
+                        "vehicle_count": vol,
+                        "average_speed": avg_spd,
+                        "road_capacity": cap,
+                        "speed_limit": limit,
+                        "lane_count": c["lane_count"],
+                        "traffic_utilization": round(util, 3),
+                        "speed_reduction": round(speed_deficit, 3),
+                        "congestion_index": ci,
+                        "congestion_level": level,
+                        "weather_condition": weather_cond,
+                        "rainfall": rain_mm,
+                        "temperature": temp_c,
+                        "visibility": visibility_km,
+                        "accident_count": acc_count,
+                        "accident_severity": acc_sev
+                    })
 
-                timestamp_iso = f"{date_str}T{hour:02d}:00:00+05:30"
-                rec_id = f"REC_{city_key.upper()}_{rid}_{current_day.strftime('%Y%m%d')}_{hour:02d}"
-
-                records.append({
-                    "record_id": rec_id,
-                    "city_id": city_key,
-                    "city_name": c_meta["city_name"],
-                    "timestamp": timestamp_iso,
-                    "date": date_str,
-                    "hour": hour,
-                    "day_of_week": day_name,
-                    "is_weekend": is_weekend,
-                    "is_peak_hour": is_peak_hour,
-                    "road_id": rid,
-                    "road_name": c["road_name"],
-                    "zone": c["zone"],
-                    "road_type": c["road_type"],
-                    "latitude": c["lat"],
-                    "longitude": c["lng"],
-                    "vehicle_count": vol,
-                    "average_speed": avg_spd,
-                    "road_capacity": cap,
-                    "speed_limit": limit,
-                    "lane_count": c["lane_count"],
-                    "traffic_utilization": round(util, 3),
-                    "speed_reduction": round(speed_deficit, 3),
-                    "congestion_index": ci,
-                    "congestion_level": level,
-                    "weather_condition": weather_cond,
-                    "rainfall": rain_mm,
-                    "temperature": temp_c,
-                    "visibility": visibility_km,
-                    "accident_count": acc_count,
-                    "accident_severity": acc_sev
-                })
-
+    sampling_desc = f"{interval_minutes} minutes" if interval_minutes < 60 else "1 hour (60 minutes)"
     dataset = {
         "metadata": {
             "dataset_name": f"{c_meta['city_name']} Urban Calibrated Multi-Day Development Benchmark",
             "city_id": city_key,
             "city_name": c_meta["city_name"],
-            "version": "1.0.0",
+            "version": "1.1.0",
             "is_simulated": True,
             "data_classification": "SIMULATED",
             "watermark": "SIMULATED BENCHMARK DATA - STRICTLY FOR MULTI-CITY DEVELOPMENT AND EVALUATION",
             "temporal_scope": f"{records[0]['date']} to {records[-1]['date']} ({num_days} Days)",
-            "sampling_frequency": "1 hour (60 minutes)",
+            "sampling_frequency": sampling_desc,
+            "interval_minutes": interval_minutes,
             "corridor_count": len(corridor_specs),
             "record_count": len(records),
             "random_seed": actual_seed,
@@ -291,7 +306,7 @@ def generate_single_day_fixture(city_id: str = "chennai", seed: Optional[int] = 
     city_key = city_id.lower().strip()
     c_meta = CITY_METADATA.get(city_key, CITY_METADATA["chennai"])
     corridor_specs = load_corridor_specs(city_key)
-    multi_data = generate_multiday_benchmark(city_id=city_key, num_days=1, seed=seed)
+    multi_data = generate_multiday_benchmark(city_id=city_key, num_days=1, seed=seed, interval_minutes=60)
     
     # Organize into corridor hourly profile format for fast in-memory loading
     corridors_output = []

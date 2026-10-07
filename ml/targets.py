@@ -15,8 +15,12 @@ class TargetBuilder:
     Never uses target timestamp information in feature inputs.
     """
 
-    def __init__(self, primary_lead_steps: int = 1):
-        # 1 step = next time slice (+30m to +60m depending on sampling frequency)
+    def __init__(self, primary_lead_steps: int = 2):
+        # 15-min interval mapping:
+        # lead 1 = +15m (shift -1)
+        # lead 2 = +30m (shift -2) -> Default primary horizon
+        # lead 3 = +45m (shift -3)
+        # lead 4 = +60m (shift -4)
         self.primary_lead_steps = primary_lead_steps
 
     def attach_targets(self, df: pd.DataFrame, lead_steps: int = None) -> pd.DataFrame:

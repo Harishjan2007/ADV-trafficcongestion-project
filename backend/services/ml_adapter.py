@@ -38,15 +38,23 @@ class MLPredictionAdapter:
         return cls._instance
 
     def _extract_corridor_features(self, road_id: str, hour: int = 8, city: str = "chennai") -> Dict[str, Any]:
-        """Extracts current observed features for a road in a city to pass to ML engine."""
+        """
+        Extracts genuine observed features and backward historical observations for a road in a city.
+        Retrieves actual lagged observations (T-1, T-2, T-3) and computes rolling statistics
+        strictly from real data storage rather than fabricated multipliers.
+        """
         c = str(city).lower().strip() if city else "chennai"
-        slice_records = self.data_loader.get_time_slice(hour, city=c)
-        rec = next((r for r in slice_records if r["road_id"] == road_id), None)
+        prof = self.data_loader.get_location_profile(road_id, city=c)
+        series = prof.get("hourly_series", []) if prof else []
         
-        if not rec:
-            prof = self.data_loader.get_location_profile(road_id, city=c)
-            if prof and prof.get("hourly_series"):
-                rec = prof["hourly_series"][min(hour, len(prof["hourly_series"])-1)]
+        if not series:
+            all_records = self.data_loader.get_canonical_records(city=c)
+            series = sorted([r for r in all_records if r.get("road_id") == road_id], key=lambda x: x.get("hour", 0))
+
+        # Current slice record at T = hour
+        rec = next((r for r in series if r.get("hour") == hour), None)
+        if not rec and series:
+            rec = series[min(hour, len(series) - 1)]
 
         if rec:
             speed_limit = float(rec.get("speed_limit", 50.0))
@@ -62,6 +70,52 @@ class MLPredictionAdapter:
             speed_limit, road_cap, lane_count = 50.0, 3600, 3
             curr_spd, curr_vol, curr_ci, rain, acc = 30.0, 2000, 50.0, 0.0, 0
             road_name = road_id
+
+        # Backward historical observations from real series data (T-1, T-2, T-3)
+        if series and len(series) >= 4:
+            curr_idx = next((i for i, r in enumerate(series) if r.get("hour") == hour), hour % len(series))
+            rec_lag1 = series[(curr_idx - 1) % len(series)]
+            rec_lag2 = series[(curr_idx - 2) % len(series)]
+            rec_lag3 = series[(curr_idx - 3) % len(series)]
+            
+            vol_lag1 = int(rec_lag1.get("vehicle_count", curr_vol))
+            vol_lag2 = int(rec_lag2.get("vehicle_count", curr_vol))
+            vol_lag3 = int(rec_lag3.get("vehicle_count", curr_vol))
+            
+            spd_lag1 = float(rec_lag1.get("average_speed", curr_spd))
+            spd_lag2 = float(rec_lag2.get("average_speed", curr_spd))
+            spd_lag3 = float(rec_lag3.get("average_speed", curr_spd))
+            
+            ci_lag1 = float(rec_lag1.get("congestion_index", curr_ci))
+            ci_lag2 = float(rec_lag2.get("congestion_index", curr_ci))
+            ci_lag3 = float(rec_lag3.get("congestion_index", curr_ci))
+            acc_lag1 = int(rec_lag1.get("accident_count", acc))
+        else:
+            vol_lag1, vol_lag2, vol_lag3 = curr_vol, curr_vol, curr_vol
+            spd_lag1, spd_lag2, spd_lag3 = curr_spd, curr_spd, curr_spd
+            ci_lag1, ci_lag2, ci_lag3 = curr_ci, curr_ci, curr_ci
+            acc_lag1 = acc
+
+        # Rolling statistics strictly from real historical observations
+        rolling_speed_mean = float(np.mean([spd_lag1, spd_lag2, spd_lag3]))
+        rolling_vol_mean = float(np.mean([vol_lag1, vol_lag2, vol_lag3]))
+        rolling_ci_mean = float(np.mean([ci_lag1, ci_lag2, ci_lag3]))
+        rolling_ci_std = float(np.std([ci_lag1, ci_lag2, ci_lag3], ddof=1)) if len({ci_lag1, ci_lag2, ci_lag3}) > 1 else 0.0
+
+        # Spatial neighbor congestion at T-1 from network topology
+        from ml.features import FeatureEngineer
+        fe = FeatureEngineer()
+        neighbors = fe.neighbor_map.get(road_id, [])
+        neighbor_cis = []
+        for nid in neighbors:
+            n_prof = self.data_loader.get_location_profile(nid, city=c)
+            if n_prof and n_prof.get("hourly_series"):
+                n_series = n_prof["hourly_series"]
+                n_idx = next((i for i, r in enumerate(n_series) if r.get("hour") == hour), hour % len(n_series))
+                n_lag1 = n_series[(n_idx - 1) % len(n_series)]
+                neighbor_cis.append(float(n_lag1.get("congestion_index", ci_lag1)))
+        
+        neighbor_congestion_lag1 = float(np.mean(neighbor_cis)) if neighbor_cis else ci_lag1
 
         is_weekend = 0
         is_peak = 1 if ((8 <= hour <= 11) or (17 <= hour <= 20)) and not is_weekend else 0
@@ -80,23 +134,23 @@ class MLPredictionAdapter:
             "road_capacity": road_cap,
             "speed_limit": speed_limit,
             "lane_count": lane_count,
-            "vehicle_count_lag_1": curr_vol,
-            "vehicle_count_lag_2": int(curr_vol * 0.95),
-            "vehicle_count_lag_3": int(curr_vol * 0.90),
-            "speed_lag_1": curr_spd,
-            "speed_lag_2": float(min(speed_limit, curr_spd * 1.05)),
-            "speed_lag_3": float(min(speed_limit, curr_spd * 1.10)),
-            "congestion_lag_1": curr_ci,
-            "congestion_lag_2": float(max(0.0, curr_ci * 0.95)),
-            "rolling_speed_mean_3h": curr_spd,
-            "rolling_vol_mean_3h": float(curr_vol),
-            "rolling_ci_mean_3h": curr_ci,
-            "rolling_ci_std_3h": 3.5,
-            "neighbor_congestion_lag_1": curr_ci,
+            "vehicle_count_lag_1": vol_lag1,
+            "vehicle_count_lag_2": vol_lag2,
+            "vehicle_count_lag_3": vol_lag3,
+            "speed_lag_1": spd_lag1,
+            "speed_lag_2": spd_lag2,
+            "speed_lag_3": spd_lag3,
+            "congestion_lag_1": ci_lag1,
+            "congestion_lag_2": ci_lag2,
+            "rolling_speed_mean_3h": rolling_speed_mean,
+            "rolling_vol_mean_3h": rolling_vol_mean,
+            "rolling_ci_mean_3h": rolling_ci_mean,
+            "rolling_ci_std_3h": rolling_ci_std,
+            "neighbor_congestion_lag_1": neighbor_congestion_lag1,
             "rainfall": rain,
             "temperature": 30.0,
             "is_raining": 1 if rain > 0 else 0,
-            "accident_lag_1": acc
+            "accident_lag_1": acc_lag1
         }
         return features
 
@@ -160,34 +214,12 @@ class MLPredictionAdapter:
                 return pred
             except Exception as e:
                 logger.error(f"Inference error for {c}/{road_id}: {e}")
+                raise RuntimeError(f"ML Inference failed for {c}/{road_id}: {e}")
 
-        # 3. Defensive Offline Fallback (Clearly labeled)
-        return MLPredictionPayload(
-            location_id=lookup_id,
-            city_id=c,
-            city_name=c.capitalize(),
-            road_name=road_name,
-            prediction_timestamp=datetime.now().isoformat(),
-            prediction_horizon=canon_h,
-            predicted_congestion_level="Moderate",
-            predicted_congestion_index=48.0,
-            predicted_vehicle_count=2200,
-            predicted_speed=32.5,
-            confidence=0.72,
-            model_version="OFFLINE-DEVELOPMENT-FALLBACK",
-            observed_congestion_index=round(curr_ci, 1),
-            observed_congestion_level=curr_level,
-            observed_speed=round(curr_spd, 1),
-            observed_vehicle_count=curr_vol,
-            data_status="SIMULATED BENCHMARK DATA" if c in ("vellore", "coimbatore") else "PREDICTED",
-            model_status="OFFLINE",
-            top_contributing_features=[
-                FeatureContribution(
-                    feature_name="Historical Diurnal Baseline",
-                    importance_score=0.80,
-                    direction="increases_congestion"
-                )
-            ]
+        # If model is unavailable, DO NOT silently return fake predictions (Phase 5)
+        raise RuntimeError(
+            f"ML Model Unavailable for city '{c}'. Genuine model artifacts have not been loaded. "
+            f"Status: {ml_engine.get_status().get('error', 'Offline')}"
         )
 
     def get_all_predictions(self, horizon: str = "30min", hour: int = 8, city: str = "chennai") -> List[MLPredictionPayload]:

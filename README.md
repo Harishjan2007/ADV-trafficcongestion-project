@@ -42,21 +42,27 @@ graph TD
 5. **Location Intelligence Drawer:** Slides out contextual deep-dives for any selected corridor, displaying speed deficit metrics, road utilization, and dispatch recommendations.
 6. **Pearson Correlation Matrix:** Explores the statistical interactions of lane capacity, volume, speed, visibility, and precipitation.
 7. **Directional Flow Vectors:** Visualizes live arterial flow direction using animated particle trajectories on the map.
-8. **Unsupervised Behavioral Clustering:** Groups corridors dynamically using K-Means clustering based on congestion profiles (e.g., Rain-Sensitive Arterials, Peak-Hour Chokepoints) mapped visually on the canvas.
-9. **✦ ML Predictive Forecasting (+30m):** Renders a purple predictive spatial forecast layer alongside confidence intervals ($95\%$ bounds) and feature importance bars.
+8. **Unsupervised Behavioral Clustering:** Groups corridors dynamically using K-Means clustering based on multidimensional feature variance (e.g., Rain-Sensitive Arterials, Peak-Hour Chokepoints) mapped visually on the canvas.
+9. **✦ Multi-Horizon ML Predictive Forecasting (+15m, +30m, +45m, +60m):** Renders predictive spatial forecast layers across 15-minute intervals alongside Model Confidence Scores (uncertainty bounds) and Feature Contribution Analysis driver rankings.
+10. **Simulation / Replay Mode:** Chronological 24-hour playback of diurnal cycles across monitored arterial corridors.
 
 ---
 
-## 📊 Data Lineage & Tiering
+## 📊 Data Provenance & Telemetry Integrity
 
-The platform explicitly demarcates all telemetry labels for decision-making integrity:
+The platform strictly differentiates real physical geospatial context from simulated developmental traffic telemetry:
 
-| Data Tier               | Description                                                           | Display Locations                            |
-| :---------------------- | :-------------------------------------------------------------------- | :------------------------------------------- |
-| **`OBSERVED`**  | Actual physical coordinates and properties of Chennai roadways.       | Map geometry, road names, speed limit.       |
-| **`DERIVED`**   | Mathematically calculated indices (Congestion Index, Priority Score). | Leaderboards, KPI cards, correlation values. |
-| **`PREDICTED`** | ML-inferred congestion estimates with confidence bounds.              | Predictive map layer, ML forecast charts.    |
-| **`SIMULATED`** | Synthetic fixtures mapped to standard diurnal shapes.                 | Identified with a`"SIMULATED DATA"` badge. |
+* **Real Geospatial Context:** Chennai arterial road network geometry, coordinates, and physical attributes (speed limits, lane counts, and design capacities) are grounded in real-world Chennai road layout derived from OpenStreetMap and GIS data.
+* **Development / Synthetic Benchmark Telemetry:** Traffic sensor telemetry (vehicle volume, average speed, incident reports, and precipitation accumulation) is calibrated synthetic development benchmark data created specifically for student project pipeline validation.
+* **No Live Sensor Claim:** The system does NOT receive live police or municipal sensor feeds; dynamic updates run in **Simulation / Replay Mode**.
+* **Explainability & Uncertainty:** Feature attribution uses **Feature Contribution Analysis** (standardized deviation multiplied by model importance), and confidence bands represent calibrated **Model Confidence Scores**.
+
+| Data Tier | Description | Source / Status | Display Locations |
+| :--- | :--- | :--- | :--- |
+| **`OBSERVED`** | Physical geometry, coordinates, road names, and speed limits. | OpenStreetMap GIS Data | Road linestrings, corridor labels. |
+| **`SIMULATED`** | Calibrated synthetic 15-minute developmental traffic telemetry. | Project Benchmark Generator | Speed, volume, incidents, replay slider. |
+| **`DERIVED`** | Mathematically calculated indices (Congestion Index, Priority Score). | Analytical Pipeline | Leaderboards, KPI cards, correlation values. |
+| **`PREDICTED`** | Genuine ML forecasts across +15m, +30m, +45m, +60m horizons. | Trained HistGradientBoosting Models | Predictive layer, multi-horizon charts. |
 
 ---
 

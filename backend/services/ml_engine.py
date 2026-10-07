@@ -76,6 +76,30 @@ class MLEngine:
         if not os.path.exists(source_30m):
             source_30m = os.path.join(ARTIFACTS_DIR, "traffic_model_30m.joblib")
 
+        # Auto-train if artifacts are missing or incomplete
+        h15_path = os.path.join(self.artifacts_dir, "traffic_model_15min.joblib")
+        if not os.path.exists(h15_path):
+            h15_path = os.path.join(ARTIFACTS_DIR, "traffic_model_15min.joblib")
+
+        if (not os.path.exists(source_30m) or not os.path.exists(h15_path)) and auto_train_if_missing:
+            logger.info(f"ML artifacts missing or incomplete for {self.city_name}. Initiating automated training pipeline...")
+            try:
+                if self.city_id == "chennai":
+                    from ml.train import run_training_pipeline
+                    run_training_pipeline()
+                else:
+                    from ml.train_cities import train_city_models
+                    train_city_models(self.city_id)
+
+                if os.path.exists(model_30m_path):
+                    source_30m = model_30m_path
+                elif os.path.exists(os.path.join(ARTIFACTS_DIR, "traffic_model_30min.joblib")):
+                    source_30m = os.path.join(ARTIFACTS_DIR, "traffic_model_30min.joblib")
+                elif os.path.exists(os.path.join(ARTIFACTS_DIR, "traffic_model_30m.joblib")):
+                    source_30m = os.path.join(ARTIFACTS_DIR, "traffic_model_30m.joblib")
+            except Exception as e:
+                logger.warning(f"Automated ML training pipeline failed for {self.city_name}: {e}")
+
         if not os.path.exists(source_30m):
             self.is_loaded = False
             self.load_error = f"Model artifact not found at: {model_30m_path}."
@@ -101,7 +125,7 @@ class MLEngine:
             # Load 30m model as a distinct independent object instance
             self.models["30min"] = joblib.load(source_30m)
 
-            # Load other horizons strictly from city artifact dir or base artifacts
+            # Load distinct models for each horizon (+15m, +45m, +60m)
             for h in ["15min", "45min", "60min"]:
                 h_path = os.path.join(self.artifacts_dir, f"traffic_model_{h}.joblib")
                 if not os.path.exists(h_path):
@@ -237,7 +261,8 @@ class MLEngine:
             predicted_speed=pred_speed,
             confidence=calibrated_conf,
             model_version=f"{self.metadata.get('model_name', 'HistGradientBoosting')}-v{self.metadata.get('model_version', '1.0')}",
-            top_contributing_features=top_explanations
+            top_contributing_features=top_explanations,
+            data_status="PREDICTED" if self.city_id == "chennai" else "SIMULATED BENCHMARK DATA"
         )
 
 

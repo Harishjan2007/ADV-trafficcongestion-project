@@ -91,9 +91,19 @@ CITY_METADATA = {
 PRIMARY_TARGET = "congestion_index"
 SECONDARY_TARGETS = ["predicted_speed", "predicted_vehicle_count"]
 
-# Forecast Horizons (in minutes)
+# Forecast Horizons (in minutes) and 15-Minute Sampling Interval Mapping
 DEFAULT_HORIZON = 30
 SUPPORTED_HORIZONS = [15, 30, 45, 60]
+SAMPLING_INTERVAL_MINUTES = 15
+
+# Canonical shift mapping for 15-minute intervals:
+# +15m = shift(-1), +30m = shift(-2), +45m = shift(-3), +60m = shift(-4)
+HORIZON_STEP_MAP = {
+    "15min": 1,
+    "30min": 2,  # Primary lead (+30 min)
+    "45min": 3,
+    "60min": 4
+}
 
 # Chronological Split Ratios
 TRAIN_RATIO = 0.70
